@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>欢迎进行仿真实验</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/window.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/define.js"></script>
+    <script src="js/header.js"></script>
+</head>
+
+<body
+    style="background: url(images/fly.jpeg) no-repeat center/100%; background-position: top center; overflow: hidden; ">
+    <!-- 头部 -->
+    <div class="w">
+        <header class="header">
+            <div class="header_left"
+                style="float: left; top:30; background: url(images/logo-mini.png) no-repeat; width: 300px; height: 50px;">
+                <ul>   
+                    <li><a href="knowledge_angle.html" target="_Blank">知识角</a></li>
+                    <li class="kno_hint"> <a href="kno_hint.html" target="_Blank" style>
+                            <p>实验报告</p>
+                        </a></li>
+                </ul>
+
+            </div>
+            <div class="header_middle">
+                <ul class="tab_list">
+                    <li class="exper_intro">
+                        <a href="javascript:;">实验简介</a>
+                    </li>
+                    <li></li>
+                    <li class="exper_choose">
+                        <a href="javascript:;">无人机集群组网协同实验</a>
+                        <ul>
+                            <li><a href="experConfig.html" style="font-size: 14px;">1.1 编队变化下的组网协同</a></li>
+                            <li><a href="experConfig.html" style="font-size: 14px;">1.2 自主避障下的组网协同</a></li>
+                        </ul>
+                    </li>
+                    <li></li>
+                    <li class="exper_choose">
+                        <a href="javascript:;">无人机集群信号欺骗实验</a>
+                        <ul>
+                            <li><a href="experConfig.html" style="font-size: 14px;">2.1 编队变化下的信号欺骗</a></li>
+                            <li><a href="experConfig.html" style="font-size: 14px;">2.2 自主避障下的信号欺骗</a></li>
+                        </ul>
+                    </li>
+                    <li></li>
+                    <li class="exper_choose">
+                        <a href="javascript:;">无人机集群网络攻击实验</a>
+                        <ul>
+                            <li><a href="experConfig.html" style="font-size: 14px;">3.1 编队变化下的网络攻击</a></li>
+                            <li><a href="experConfig.html" style="font-size: 14px;">3.2 自主避障下的网络攻击</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="header_right">
+                <ul>
+                    <li class="start" stylep="width: 75px; margin:10px 3px">
+                        <p>开始仿真</p>
+                    </li>
+                    <li class="suspend" style="width: 50px; margin:10px 3px">
+                        <p>暂停</p>
+                    </li>
+                    <li class=" exit" style="width: 75px; margin:10px -3px">
+                        <span>退出</span>
+                    </li>
+                </ul>
+            </div>
+        </header>
+        <!-- 主体 -->
+        <div class="major">
+        </div>
+
+        <!-- 尾部 -->
+        <footer class="footer">
+
+        </footer>
+    </div>
+
+    <!-- 欢迎窗口 -->
+    <div class="wel_window popup_window" style="display: block;">
+        <p></p>
+        <div class="wel_content popup_window_content">
+            <p></p>
+            无人机集群网络化智能协同技术虚拟仿真实验
+        </div>
+        <div class="wel_login_button popup_window_login_button">
+            <a href="javascript:void(0);">确认</a>
+        </div>
+    </div>
+
+
+    <!-- 实验简介 -->
+    <div class="intro_window popup_window">
+        <p></p>
+        <div class="intro_content popup_window_content" style="padding-top: 30px;">
+            <div id="intro">
+                <img src="./images/test.png" alt="" style="width: 150px; height: 150px; margin-left: 30%;">
+                <p></p>
+            </div>
+        </div>
+        <div class="intro_button popup_window_login_button">
+            <a href="javascript:void(0);">确认</a>
+        </div>
+    </div>
+
+    <!-- 选择实验窗口 -->
+    <div class="choose_window popup_window" style="display:none;">
+        <p></p>
+        <div class="choose_content popup_window_content">
+            <p></p>
+        </div>
+        <div class="choose_button popup_window_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>无人机集群组网</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/common.css">
+    <style>
+        p {
+            color: black;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body style="background-color: #F0F0F0;">
+    <div class="w">
+        <h2 style=" color: black;">无人机集群组网</h2>
+        <p style="text-indent: 2em;">
+            自组网（Ad hoc NETwork）：自组织网络是由一群兼具终端与路由功能的设备通过无线链路形成的无中心、临时性自治系统。当节点可移动时，称为移动自组网。飞行自组网（Flying Ad hoc
+            NETwork）是移动自组网的一个分支，它将移动自组网的思想拓展到空天领域。一般具有高动态拓扑 、节点分布密集、能量有限等特性。
+        </p>
+        <p style="text-indent: 2em;">
+            自组网路由协议用于监控网络拓扑结构变化,交换路由信息,定位目的节点位置,产生、维护和选择路由,并根据选择的路由转发数据。本实验包含两种路由协议，静态路由和动态路由。静态路由指的是路由表（routing
+            entry）由手动配置，而非动态决定。与动态不同，静态路由是固定的，不会改变，即使网络状况已经改变或是重新被组态。一般来说，静态路由是由网络管理员在路由器上手工输入路由信息以实现路由。本实验静态路由采用一跳式，即一个节点与其他节点间通信只需一跳，若两者距离在网络通信范围内，则此路由生效，否则无效。动态路由指的是根据网络拓扑结构的变化，路由协议会自动调整路由信息以实现路由。本实验采用AODV动态路由协议。
+        </p>
+        <div style=" width: 500px; height: 300px; margin-left:30%;margin-top: 10px;"><img src="exper_img/2.png" alt=""
+                style="width: 100%; height: 100%;">
+        </div>
+        <p style="text-align: center; margin-bottom: 10px;">图2. AODV协议原理图</p>
+        <p style="text-indent: 2em;">
+            AODV(Ad hoc On-demand Distance Vector
+            Routing)是一种按需路由协议。当一个节点需要给网络中的其他节点传送信息时，如果没有到达目标节点的路由，则必须先以多播的形式发出RREQ(路由请求)报文。具体过程如图2所示。广播RREQ路由请求帧，中间节点更新各自到源节点的路由表，如果收到RREQ的节点不是目的节点，并且没有到达目的节点的更新的有效路由，则转发该RREQ,中间节点维护指向路由源节点的反向路由。目的节点或存在到目的节点有效路由的中间节点产生RREP路由应答帧，RREP通过之前建立的反向节点单播至源节点，源节点收到RREP应答帧，至此源节点可以向目的节点发送数据包。AODV协议中路由表项建立以后，路由中的每个节点都要执行路由维持、更新、管理路由表的任务。当链路发生故障，所有直接使用该链路的邻接点都产生一个RERR（路由错误）消息，然后这些节点会将RERR消息转发到其他节点，其他节点也一样处理，直到所有受影响的节点都收到RERR消息。无论是源节点还是中间节点，当链路故障后需要再次发送数据到受影响的目的节点，则需要再次发送RREQ消息来发现到目的节点的路由，在重新建立路由之前的数据都需要缓存起来。路由更新机制如图3所示。
+        </p>
+        <div style=" width: 500px; height: 500px; margin-left:30%;margin-top: 10px;"><img src="exper_img/3.png" alt=""
+                style="width: 100%; height: 100%;">
+        </div>
+        <p style="text-align: center; margin-bottom: 10px;">图3. 路由更新机制</p>
+
+        <p style="text-indent: 2em;">
+            在仿真过程中，如图4所示，绿色连线表示已经建立的路由连接，红色连线表示在飞行过程中由动态路由新构建的路由连接。另外，注意在静态路由情况下，当两个无人机的距离超过通信距离，绿色连线将消失（此时两者的路由连接仍然存在）。当两个无人机距离再次小于等于通信距离后，绿色连线会恢复显示（不出现红线）。
+        </p>
+
+        <div style=" width: 300px; height: 300px; margin-left:37%;margin-top: 10px;"><img src="exper_img/4.png" alt=""
+                style="width: 100%; height: 100%;">
+        </div>
+        <p style="text-align: center; margin-bottom: 10px;">图4. 仿真中的网络拓扑连接示意图</p>
+
+        <p style="text-indent: 2em;">
+            在仿真中可配置的组网参数如下：路由协议（用于控制组网所采用的路由协议），通信距离（用于设置集群中无人机之间能互相传递信息的最大距离），通信间隔（用于控制仿真过程中两次通信之间的时间间隔），数据发送速率表示单位时间内无人机发送的数据量，以Mbps为单位
+            （用于设置无人机数据包发送速率），信道传输速率（用于设置无人机发送的数据在传输介质上的传输速率），
+            传输损耗模型（用于设置信号在传输过程中的损耗模式，比如“基于距离”表示距离越远，损耗越大）。
+        </p>
+
+        <p style="text-indent: 2em;">
+            在仿真过程中我们通过以下网络指标反应无人机集群组网的性能：
+        <p style="text-indent: 2em;">
+            瞬时丢包率：每次通信中网络中丢失的数据包数量占所发送数据包的比率
+        </p>
+        <p style="text-indent: 2em;">
+            平均丢包率：从仿真开始到当前时刻网络中丢失的数据包总量占所发送数据包总量的比率。
+        </p>
+        <p style="text-indent: 2em;">
+            吞吐量：X = C/T，C为每次通信中无人机间成功通信所产生的网络流量（bit），T为一次通信所需要的时间。 </p>
+        <p style="text-indent: 2em;">
+            延迟：Delay = T2 –T1.T1为源节点发送数据包的当前时间，T2为目的节点接收到数据包的当前时间。 </p>
+    </div>
+</body>
+
+</html>

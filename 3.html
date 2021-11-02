@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>无人机GPS信号欺骗</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/common.css">
+    <style>
+        p {
+            color: black;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body style="background-color: #F0F0F0;">
+    <div class="w">
+        <h2 style=" color: black;">无人机GPS信号欺骗</h2>
+        <p style="text-indent: 2em;">
+            1) GPS定位原理:
+        </p>
+        <div style=" width: 500px; height: 300px; margin-left:30%;margin-top: 10px;"><img src="exper_img/5.png" alt=""
+                style="width: 100%; height: 100%;">
+        </div>
+        <p style="text-align: center; margin-bottom: 10px;">图5. GPS定位原理图</p>
+        <p style="text-indent: 2em;">
+            GPS接收机通过测量信号从卫星到该地的单向传播时间，并代入位置结算算法确定接收机位置信息。图5展示了GPS定位的基本的原理，S_i表示GPS接收机同时接收到的各个卫星，利用GPS定位的相关技术，得到卫星发射信号由卫星到接收机的延时，再乘以电磁波的传播速度可以计算出卫星距离接收机的伪距（pseudo
+            range）P_i，其中i表示卫星编号i=(1,2,3,4)，从卫星信号的导航电文中可获得各卫星的位置（X_i，Y_i, Z_i）。联立以下方程组可求解接受机自身位置（x, y, z）。
+        </p>
+
+        <div style=" width: 400px; height: 50px; margin-left:35%;margin-top: 10px;"><img src="exper_img/10.png" alt=""
+                style="width: 100%; height: 100%;">
+        </div>
+
+        <p style="text-indent: 2em;">
+            由于卫星钟、接收机钟的误差及无线电信号经过电离层和对流层的延迟，实际求得的距离与几何距离有一定的差值，因此称GPS测出的距离为伪距（pseudo
+            range）。根据以上方程组利用三角形测量原理，采用3颗卫星可以计算出无人机的位置，但是由于GPS定位系统测量出的卫星距离接收机的伪距不够精确，所以采用4颗卫星实现无人机的准确定位。
+        </p>
+
+        <p style="text-indent: 2em;">
+            2) 转发式GPS信号欺骗原理:
+        </p>
+
+        <p style="text-indent: 2em;">
+            转发式GPS信号欺骗采用一个延时设备将某一颗或者几颗GPS卫星的导航信号进行延时和放大后转发出去，若目标接受机锁定转发受欺骗信号，就会得到错误的伪距值称为欺骗伪距，从而解算出错误的定位位置，实现GPS信号欺骗的目的。GPS欺骗原理如图6
+            所示，P1伪距与原始伪距的差值用Cτ表示，记作欺骗伪距，C表示电磁波的传播速度。τ表示转发攻击设备将导航信号所延长的时间。
+        </p>
+        <div style=" width: 500px; height: 300px; margin-left:30%;margin-top: 10px;"><img src="exper_img/6.png" alt=""
+                style="width: 100%; height: 100%;">
+        </div>
+        <p style="text-align: center; margin-bottom: 10px;">图6. 转发式GPS信号欺骗原理图</p>
+
+        <p style="text-indent: 2em;">
+            在仿真过程中，如图7所示，红色的无人机表示是受到GPS信号欺骗的无人机，蓝色的无人机是未收到欺骗的无人机。无人机受欺骗的位置用实心的粉红色点表示（如图7中的4’, 5’）。
+        </p>
+
+        <div style=" width: 300px; height: 300px; margin-left:37%;margin-top: 10px;"><img src="exper_img/7.png" alt=""
+                style="width: 100%; height: 100%;">
+        </div>
+        <p style="text-align: center; margin-bottom: 10px;">图7. 仿真中的无人机GPS位置欺骗示意图</p>
+
+        <p style="text-indent: 2em;">
+            在仿真中可配置的GPS信号欺骗参数如下：
+        </p>
+        <p style="text-indent: 2em;">
+            欺骗均值（用于控制GPS信号欺骗中欺骗伪距的大小）表示在转发式GPS欺骗中转发攻击设备将导航信号所延长的时间τ满足正太分布，即欺骗伪距Cτ的分布也满足正态分布，正态分布的均值记作欺骗均值；欺骗方差（用于控制GPS信号欺骗中欺骗伪距的波动范围）表示在转发式GPS欺骗中欺骗伪距Cτ的分布满足正太分布，正太分布的方差记作欺骗方差，欺骗方差决定Cτ在欺骗均值附近的波动范围；欺骗数量（用于控制无人机编队中受欺骗无人机的数量）；欺骗位置（用于控制受欺骗无人机在无人机集群编队中的位置）。
+        </p>
+    </div>
+</body>
+
+</html>

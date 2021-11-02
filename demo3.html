@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="Resource/js/jquery-2.0.3.min.js" ></script>
+    <script type="text/javascript" src="Resource/js/three.js" ></script>
+    <script type="text/javascript" src="Resource/js/TrackballControls.js" ></script>
+    <script type="text/javascript" src="Resource/js/DDSLoader.js" ></script>
+    <script type="text/javascript" src="Resource/js/OBJLoader.js" ></script>
+    <script type="text/javascript" src="Resource/js/OBJMTLLoader.js" ></script>
+    <script type="text/javascript" src="libs/OrbitControls.js" ></script>
+    <script type="text/javascript" src="libs/dat.gui.js"></script>
+    <title></title>
+</head>
+<style>
+    body{
+        margin: 0;
+        overflow: hidden;
+    }
+    #percent {
+        position: absolute;
+        width: 200px;
+        height: 20px;
+        color: red;
+        text-align: center;
+        border: 1px;
+    }
+</style>
+<body>
+<div id="percent"></div>
+<div id="WebGL-output">
+
+</div>
+<script>
+            function Loadmodel(callback) {
+                // model
+                var flymachine;
+                var onProgress = function (xhr) {
+                    if (xhr.lengthComputable) {
+                        var percentComplete = xhr.loaded / xhr.total * 100;
+                        var percent = document.getElementById("percent");
+                        percent.innerText = Math.round(percentComplete, 2) + '% 已经加载';
+
+                    }
+                };
+                var onError = function (xhr) {
+                };
+                var mtlLoader = new THREE.MTLLoader();
+                mtlLoader.setPath('assets/models/uav/');
+                mtlLoader.load('demo5.mtl', function (materials) {
+                        materials.preload();
+                        var objLoader = new THREE.OBJLoader();
+                        objLoader.setMaterials(materials);
+                        objLoader.setPath('assets/models/uav/');
+                        objLoader.load('demo5.obj', function (object) {
+                            flymachine = object;
+                            callback(flymachine);
+                        }, onProgress, onError)
+                    }
+                );
+
+            }
+
+            function init() {
+                //直接开启帧数检测
+                //编辑代码处
+                var scene = new THREE.Scene();//场景构建
+                var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);//相机构建
+                var renderer = new THREE.WebGLRenderer();//渲染器构建
+                renderer.setClearColor(0xEEEEEE);
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.shadowMapEnabled = true;//激活阴影
+                //构建一个坐标轴,蓝色是x轴，红色是z轴，绿色是y轴
+                var axes = new THREE.AxisHelper(50);
+                scene.add(axes);
+
+                // add sky box
+                var path = "assets/textures/skybox/";//设置路径
+                var directions = ["rt", "lf", "up", "dn", "bk", "ft"];//获取对象
+                var format = ".png";//格式
+                //创建盒子，并设置盒子的大小为( 5000, 5000, 5000 )
+                var skyGeometry = new THREE.BoxGeometry(900, 900, 900);
+                //设置盒子材质
+                var materialArray = [];
+                for (var i = 0; i < 6; i++)
+                    materialArray.push(new THREE.MeshBasicMaterial({
+                        map: THREE.ImageUtils.loadTexture(path + directions[i] + format),//将图片纹理贴上
+                        side: THREE.BackSide/*镜像翻转，如果设置镜像翻转，那么只会看到黑漆漆的一片，因为你身处在盒子的内部，所以一定要设置镜像翻转。*/
+                    }));
+                var skyMaterial = new THREE.MeshFaceMaterial(materialArray);
+                var skyBox = new THREE.Mesh(skyGeometry, skyMaterial);//创建一个完整的天空盒，填入几何模型和材质的参数
+                scene.add(skyBox);//在场景中加入天空盒
+                //创建控件并绑定在相机上
+                trackballControls = new THREE.TrackballControls(camera);
+                trackballControls.rotateSpeed = 1.0;
+                trackballControls.zoomSpeed = 1.0;
+                trackballControls.panSpeed = 1.0;
+                trackballControls.noZoom = false;
+                trackballControls.noPan = false;
+                trackballControls.staticMoving = true;
+                trackballControls.dynamicDampingFactor = 0.3;
+
+                var textureGrass = THREE.ImageUtils.loadTexture("assets/textures/general/floor.jpg");
+                textureGrass.wrapS = THREE.RepeatWrapping;
+                textureGrass.wrapT = THREE.RepeatWrapping;
+                textureGrass.repeat.set(4, 4);
+                var planeGeometry = new THREE.PlaneGeometry(1000, 1000);
+                //var planeMaterial = new THREE.MeshBasicMaterial({color:0xcccccc});
+                var planeMaterial = new THREE.MeshLambertMaterial({map: textureGrass});
+                var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+                plane.rotation.x = -0.5 * Math.PI;
+                plane.position.x = 0;
+                plane.position.y = 0;
+                plane.position.z = 0;
+                scene.add(plane);
+                plane.receiveShadow = true;
+
+                //添加材质灯光阴影
+                var DirectionalLight = new THREE.DirectionalLight(0xffffff);
+                scene.add(DirectionalLight);
+                // var spotLight = new THREE.SpotLight(0xffffff);
+                // spotLight.position.set(10, 20, 30);
+                // scene.add(spotLight);
+
+
+                var textureLoader = THREE.ImageUtils.loadTexture("assets/textures/general/stone.jpg");
+                //建筑物1
+                var cubeGeometry1 = new THREE.BoxGeometry(10, 50, 16);
+                var cubeMaterial1 = new THREE.MeshBasicMaterial({map: textureLoader});
+                var cube1 = new THREE.Mesh(cubeGeometry1, cubeMaterial1);
+                cube1.position.x = 30;
+                cube1.position.y = 8;
+                cube1.position.z = 40;
+                scene.add(cube1);
+                //建筑物2
+                var cubeGeometry2 = new THREE.BoxGeometry(14, 50, 2);
+                var cubeMaterial2 = new THREE.MeshBasicMaterial({map: textureLoader});
+                var cube2 = new THREE.Mesh(cubeGeometry2, cubeMaterial2);
+                cube2.position.x = 47;
+                cube2.position.y = 8;
+                cube2.position.z = 61;
+                scene.add(cube2);
+                // //建筑物3
+                var cubeGeometry3 = new THREE.BoxGeometry(2, 50, 6);
+                var cubeMaterial3 = new THREE.MeshBasicMaterial({map: textureLoader});
+                var cube3 = new THREE.Mesh(cubeGeometry3, cubeMaterial3);
+                cube3.position.x = 55;
+                cube3.position.y = 8;
+                cube3.position.z = 63;
+                scene.add(cube3);
+                // //建筑物4
+                var cubeGeometry4 = new THREE.BoxGeometry(2, 50, 12);
+                var cubeMaterial4 = new THREE.MeshBasicMaterial({map: textureLoader});
+                var cube4 = new THREE.Mesh(cubeGeometry4, cubeMaterial4);
+                cube4.position.x = 50;
+                cube4.position.y = 8;
+                cube4.position.z = 26;
+                scene.add(cube4);
+                //路线1
+                var curve = new THREE.CatmullRomCurve3([
+                        //起点
+                        new THREE.Vector3(13, 10, 7),
+                        //中间节点
+                        new THREE.Vector3(20, 10, 11),
+                        new THREE.Vector3(30, 10, 12),
+
+                        //终点
+                        new THREE.Vector3(66.17472723382792, 10, 44.18853802059485),
+                    ],
+                    false,
+                );
+                var points = curve.getPoints(100);
+                console.log('points', points);
+                var geometry = new THREE.Geometry();
+                // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+                geometry.vertices = points;
+                var material = new THREE.LineBasicMaterial({
+                    color: 0x4488ff
+                });
+                var line = new THREE.Line(geometry, material);
+                scene.add(line);
+                //路线2
+                var curve2 = new THREE.CatmullRomCurve3([
+                        //起点
+                        new THREE.Vector3(0, 10, 10),
+                        //中间节点
+                        new THREE.Vector3(35, 10, 9),
+                        //终点
+                        new THREE.Vector3(70, 21, 32),
+                    ],
+                    false,
+                );
+                var points2 = curve2.getPoints(100);
+                var geometry2 = new THREE.Geometry();
+                // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+                geometry2.vertices = points2;
+                var material2 = new THREE.LineBasicMaterial({
+                    color: 0x4488ff
+                });
+                var line2 = new THREE.Line(geometry2, material2);
+                scene.add(line2);
+                //路线3
+                // var curve3 = new THREE.CatmullRomCurve3([
+                //         //起点
+                //         new THREE.Vector3(0, 10, 10),
+                //         //中间节点
+                //         new THREE.Vector3(5, 17, 9),
+                //         new THREE.Vector3(6, 18, 15),
+                //         //终点
+                //         new THREE.Vector3(10, 21, 32),
+                //     ],
+                //     false,
+                // );
+                // var points3 = curve3.getPoints(100);
+                // var geometry3 = new THREE.Geometry();
+                // // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+                // geometry3.vertices = points3;
+                // var material3 = new THREE.LineBasicMaterial({
+                //     color: 0x4488ff
+                // });
+                // var line3 = new THREE.Line(geometry3, material3);
+                // scene.add(line3);
+                // //路线4
+                // var curve4 = new THREE.CatmullRomCurve3([
+                //         //起点
+                //         new THREE.Vector3(0, 10, 10),
+                //         //中间节点
+                //         new THREE.Vector3(5, 17, 9),
+                //         new THREE.Vector3(6, 18, 15),
+                //         //终点
+                //         new THREE.Vector3(10, 21, 32),
+                //     ],
+                //     false,
+                // );
+                // var points4 = curve4.getPoints(100);
+                // var geometry4 = new THREE.Geometry();
+                // // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+                // geometry4.vertices = points4;
+                // var material4 = new THREE.LineBasicMaterial({
+                //     color: 0x4488ff
+                // });
+                // var line4 = new THREE.Line(geometry4, material4);
+                // scene.add(line4);
+                //
+                // //路线5
+                // var curve5 = new THREE.CatmullRomCurve3([
+                //         //起点
+                //         new THREE.Vector3(0, 10, 10),
+                //         //中间节点
+                //         new THREE.Vector3(5, 17, 9),
+                //         new THREE.Vector3(6, 18, 15),
+                //         //终点
+                //         new THREE.Vector3(10, 21, 32),
+                //     ],
+                //     false,
+                // );
+                // var points5 = curve5.getPoints(100);
+                // var geometry5 = new THREE.Geometry();
+                // // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+                // geometry5.vertices = points5;
+                // var material5 = new THREE.LineBasicMaterial({
+                //     color: 0x4488ff
+                // });
+                // var line5 = new THREE.Line(geometry5, material5);
+                // scene.add(line5);
+                //
+                // //路线6
+                // var curve6 = new THREE.CatmullRomCurve3([
+                //         //起点
+                //         new THREE.Vector3(0, 10, 10),
+                //         //中间节点
+                //         new THREE.Vector3(5, 17, 9),
+                //         new THREE.Vector3(6, 18, 15),
+                //         //终点
+                //         new THREE.Vector3(10, 21, 32),
+                //     ],
+                //     false,
+                // );
+                // var points6 = curve6.getPoints(100);
+                // var geometry6 = new THREE.Geometry();
+                // // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+                // geometry6.vertices = points6;
+                // var material6 = new THREE.LineBasicMaterial({
+                //     color: 0x4488ff
+                // });
+                // var line6 = new THREE.Line(geometry6, material6);
+                // scene.add(line6);
+                //
+                // //路线7
+                // var curve7 = new THREE.CatmullRomCurve3([
+                //         //起点
+                //         new THREE.Vector3(0, 10, 10),
+                //         //中间节点
+                //         new THREE.Vector3(5, 17, 9),
+                //         new THREE.Vector3(6, 18, 15),
+                //         //终点
+                //         new THREE.Vector3(10, 21, 32),
+                //     ],
+                //     false,
+                // );
+                // var points7 = curve7.getPoints(100);
+                // var geometry7 = new THREE.Geometry();
+                // // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+                // geometry7.vertices = points7;
+                // var material7 = new THREE.LineBasicMaterial({
+                //     color: 0x4488ff
+                // });
+                // var line7 = new THREE.Line(geometry7, material7);
+                // scene.add(line7);
+                //
+                // //路线8
+                // var curve8 = new THREE.CatmullRomCurve3([
+                //         //起点
+                //         new THREE.Vector3(0, 10, 10),
+                //         //中间节点
+                //         new THREE.Vector3(5, 17, 9),
+                //         new THREE.Vector3(6, 18, 15),
+                //         //终点
+                //         new THREE.Vector3(10, 21, 32),
+                //     ],
+                //     false,
+                // );
+                // var points8 = curve8.getPoints(100);
+                // var geometry8 = new THREE.Geometry();
+                // // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+                // geometry8.vertices = points8;
+                // var material8 = new THREE.LineBasicMaterial({
+                //     color: 0x4488ff
+                // });
+                // var line8 = new THREE.Line(geometry8, material8);
+                // scene.add(line8);
+                //
+                // //路线9
+                // var curve9 = new THREE.CatmullRomCurve3([
+                //         //起点
+                //         new THREE.Vector3(0, 10, 10),
+                //         //中间节点
+                //         new THREE.Vector3(5, 17, 9),
+                //         new THREE.Vector3(6, 18, 15),
+                //         //终点
+                //         new THREE.Vector3(10, 21, 32),
+                //     ],
+                //     false,
+                // );
+                // var points9 = curve9.getPoints(100);
+                // var geometry9 = new THREE.Geometry();
+                // // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+                // geometry9.vertices = points9;
+                // var material9 = new THREE.LineBasicMaterial({
+                //     color: 0x4488ff
+                // });
+                // var line9 = new THREE.Line(geometry9, material9);
+                // scene.add(line9);
+                //
+                // //路线10
+                // var curve10 = new THREE.CatmullRomCurve3([
+                //         //起点
+                //         new THREE.Vector3(0, 10, 10),
+                //         //中间节点
+                //         new THREE.Vector3(5, 17, 9),
+                //         new THREE.Vector3(6, 18, 15),
+                //         //终点
+                //         new THREE.Vector3(10, 21, 32),
+                //     ],
+                //     false,
+                // );
+                // var points10 = curve10.getPoints(100);
+                // var geometry10 = new THREE.Geometry();
+                // // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+                // geometry10.vertices = points10;
+                // var material10 = new THREE.LineBasicMaterial({
+                //     color: 0x4488ff
+                // });
+                // var line10 = new THREE.Line(geometry10, material10);
+                // scene.add(line10);
+                var flymachine;
+                var flymachine1;
+                var flymachine2;
+                var flymachine3;
+                var flymachine4;
+                var flymachine5;
+                var flymachine6;
+                var flymachine7;
+                var flymachine8;
+                var flymachine9;
+
+                Loadmodel(function (model) {
+                    scene.add(model);
+                    model.rotation.x = -0.25 * Math.PI;
+                    model.position.x = 13.89248863590592;
+                    model.position.y = 10;
+                    model.position.z = 7.001491984767526;
+                    model.scale.set(0.015, 0.015, 0.015);
+                    flymachine = model;
+
+                    let arr = [];
+                    for (let i = 0; i < 101; i++) {
+                        arr.push(i)
+                    }//生成一个时间序列
+                    var times = new Float32Array(arr);
+
+                    var posArr = [];
+                    points.forEach(elem => {
+                        posArr.push(elem.x, elem.y, elem.z)
+                    });
+                    // 创建一个和时间序列相对应的位置坐标系列
+                    var values = new Float32Array(posArr);
+                    // 创建一个帧动画的关键帧数据，曲线上的位置序列对应一个时间序列
+                    var posTrack = new THREE.KeyframeTrack('.position', times, values);
+                    let duration = 101;
+                    let clip = new THREE.AnimationClip("default", duration, [posTrack]);
+
+                    var mixer = new THREE.AnimationMixer(model);
+                    var AnimationAction = mixer.clipAction(clip);
+                    AnimationAction.timeScale = 100;
+                    AnimationAction.play();
+                    var clock = new THREE.Clock();
+
+                    function renderScene() {
+                        var delta = clock.getDelta();
+                        trackballControls.update(delta);
+                        renderer.render(scene, camera);
+                        requestAnimationFrame(renderScene);
+                        mixer.update(clock.getDelta());
+                    }
+
+                    renderScene();
+                });
+                Loadmodel(function (model) {
+                    scene.add(model);
+                    model.rotation.x = -0.25 * Math.PI;
+                    model.position.x = 7.001491984767526;
+                    model.position.y = 10;
+                    model.position.z = 9.991709159042927;
+                    model.scale.set(0.015, 0.015, 0.015);
+                    flymachine = model;
+
+                    let arr = [];
+                    for (let i = 0; i < 101; i++) {
+                        arr.push(i)
+                    }//生成一个时间序列
+                    var times = new Float32Array(arr);
+
+                    var posArr2 = [];
+                    points2.forEach(elem => {
+                        posArr2.push(elem.x, elem.y, elem.z)
+                    });
+                    // 创建一个和时间序列相对应的位置坐标系列
+                    var values = new Float32Array(posArr2);
+                    // 创建一个帧动画的关键帧数据，曲线上的位置序列对应一个时间序列
+                    var posTrack = new THREE.KeyframeTrack('.position', times, values);
+                    let duration = 101;
+                    let clip = new THREE.AnimationClip("default", duration, [posTrack]);
+
+                    var mixer = new THREE.AnimationMixer(model);
+                    var AnimationAction = mixer.clipAction(clip);
+                    AnimationAction.timeScale = 100;
+                    AnimationAction.play();
+                    var clock = new THREE.Clock();
+
+                    function renderScene() {
+                        var delta = clock.getDelta();
+                        trackballControls.update(delta);
+                        renderer.render(scene, camera);
+                        requestAnimationFrame(renderScene);
+                        mixer.update(clock.getDelta());
+                    }
+
+                    renderScene();
+                });
+                Loadmodel(function (model) {
+                    scene.add(model);
+                    model.rotation.x = -0.25 * Math.PI;
+                    model.position.x = 13.994618534523923;
+                    model.position.y = 10;
+                    model.position.z = 12.84339041809804;
+                    model.scale.set(0.015, 0.015, 0.015);
+                    flymachine1 = model;
+
+                    let arr = [];
+                    for (let i = 0; i < 101; i++) {
+                        arr.push(i)
+                    }//生成一个时间序列
+                    var times = new Float32Array(arr);
+
+                    var posArr2 = [];
+                    points2.forEach(elem => {
+                        posArr2.push(elem.x, elem.y, elem.z)
+                    });
+                    // 创建一个和时间序列相对应的位置坐标系列
+                    var values = new Float32Array(posArr2);
+                    // 创建一个帧动画的关键帧数据，曲线上的位置序列对应一个时间序列
+                    var posTrack = new THREE.KeyframeTrack('.position', times, values);
+                    let duration = 101;
+                    let clip = new THREE.AnimationClip("default", duration, [posTrack]);
+
+                    var mixer = new THREE.AnimationMixer(model);
+                    var AnimationAction = mixer.clipAction(clip);
+                    AnimationAction.timeScale = 100;
+                    AnimationAction.play();
+                    var clock = new THREE.Clock();
+
+                    function renderScene() {
+                        var delta = clock.getDelta();
+                        trackballControls.update(delta);
+                        renderer.render(scene, camera);
+                        requestAnimationFrame(renderScene);
+                        mixer.update(clock.getDelta());
+                    }
+
+                    renderScene();
+
+                });
+                Loadmodel(function (model) {
+                    scene.add(model);
+                    model.rotation.x = -0.25 * Math.PI;
+                    model.position.x = 11.454767884211108;
+                    model.position.y = 10;
+                    model.position.z = 4.643780814044732;
+                    model.scale.set(0.015, 0.015, 0.015);
+                    flymachine1 = model;
+
+                    let arr = [];
+                    for (let i = 0; i < 101; i++) {
+                        arr.push(i)
+                    }//生成一个时间序列
+                    var times = new Float32Array(arr);
+
+                    var posArr2 = [];
+                    points2.forEach(elem => {
+                        posArr2.push(elem.x, elem.y, elem.z)
+                    });
+                    // 创建一个和时间序列相对应的位置坐标系列
+                    var values = new Float32Array(posArr2);
+                    // 创建一个帧动画的关键帧数据，曲线上的位置序列对应一个时间序列
+                    var posTrack = new THREE.KeyframeTrack('.position', times, values);
+                    let duration = 101;
+                    let clip = new THREE.AnimationClip("default", duration, [posTrack]);
+
+                    var mixer = new THREE.AnimationMixer(model);
+                    var AnimationAction = mixer.clipAction(clip);
+                    AnimationAction.timeScale = 100;
+                    AnimationAction.play();
+                    var clock = new THREE.Clock();
+
+                    function renderScene() {
+                        var delta = clock.getDelta();
+                        trackballControls.update(delta);
+                        renderer.render(scene, camera);
+                        requestAnimationFrame(renderScene);
+                        mixer.update(clock.getDelta());
+                    }
+
+                    renderScene();
+
+                });
+                Loadmodel(function (model) {
+                    scene.add(model);
+                    model.rotation.x = -0.25 * Math.PI;
+                    model.position.x = 8.48818540063293;
+                    model.position.y = 10;
+                    model.position.z = 14.674145211332757;
+                    model.scale.set(0.015, 0.015, 0.015);
+                    flymachine1 = model;
+
+                    let arr = [];
+                    for (let i = 0; i < 101; i++) {
+                        arr.push(i)
+                    }//生成一个时间序列
+                    var times = new Float32Array(arr);
+
+                    var posArr2 = [];
+                    points2.forEach(elem => {
+                        posArr2.push(elem.x, elem.y, elem.z)
+                    });
+                    // 创建一个和时间序列相对应的位置坐标系列
+                    var values = new Float32Array(posArr2);
+                    // 创建一个帧动画的关键帧数据，曲线上的位置序列对应一个时间序列
+                    var posTrack = new THREE.KeyframeTrack('.position', times, values);
+                    let duration = 101;
+                    let clip = new THREE.AnimationClip("default", duration, [posTrack]);
+
+                    var mixer = new THREE.AnimationMixer(model);
+                    var AnimationAction = mixer.clipAction(clip);
+                    AnimationAction.timeScale = 100;
+                    AnimationAction.play();
+                    var clock = new THREE.Clock();
+
+                    function renderScene() {
+                        var delta = clock.getDelta();
+                        trackballControls.update(delta);
+                        renderer.render(scene, camera);
+                        requestAnimationFrame(renderScene);
+                        mixer.update(clock.getDelta());
+                    }
+
+                    renderScene();
+
+                });
+                Loadmodel(function (model) {
+                    scene.add(model);
+                    model.rotation.x = -0.25 * Math.PI;
+                    model.position.x = 5.875130719378333;
+                    model.position.y = 10;
+                    model.position.z = 12.881589821629689;
+                    model.scale.set(0.015, 0.015, 0.015);
+                    flymachine1 = model;
+
+                    let arr = [];
+                    for (let i = 0; i < 101; i++) {
+                        arr.push(i)
+                    }//生成一个时间序列
+                    var times = new Float32Array(arr);
+
+                    var posArr2 = [];
+                    points2.forEach(elem => {
+                        posArr2.push(elem.x, elem.y, elem.z)
+                    });
+                    // 创建一个和时间序列相对应的位置坐标系列
+                    var values = new Float32Array(posArr2);
+                    // 创建一个帧动画的关键帧数据，曲线上的位置序列对应一个时间序列
+                    var posTrack = new THREE.KeyframeTrack('.position', times, values);
+                    let duration = 101;
+                    let clip = new THREE.AnimationClip("default", duration, [posTrack]);
+
+                    var mixer = new THREE.AnimationMixer(model);
+                    var AnimationAction = mixer.clipAction(clip);
+                    AnimationAction.timeScale = 100;
+                    AnimationAction.play();
+                    var clock = new THREE.Clock();
+
+                    function renderScene() {
+                        var delta = clock.getDelta();
+                        trackballControls.update(delta);
+                        renderer.render(scene, camera);
+                        requestAnimationFrame(renderScene);
+                        mixer.update(clock.getDelta());
+                    }
+
+                    renderScene();
+
+                });
+                Loadmodel(function (model) {
+                    scene.add(model);
+                    model.rotation.x = -0.25 * Math.PI;
+                    model.position.x = 4.971484726566459;
+                    model.position.y = 10;
+                    model.position.z = 10.022858592265422;
+                    model.scale.set(0.015, 0.015, 0.015);
+                    flymachine1 = model;
+
+                    let arr = [];
+                    for (let i = 0; i < 101; i++) {
+                        arr.push(i)
+                    }//生成一个时间序列
+                    var times = new Float32Array(arr);
+
+                    var posArr2 = [];
+                    points2.forEach(elem => {
+                        posArr2.push(elem.x, elem.y, elem.z)
+                    });
+                    // 创建一个和时间序列相对应的位置坐标系列
+                    var values = new Float32Array(posArr2);
+                    // 创建一个帧动画的关键帧数据，曲线上的位置序列对应一个时间序列
+                    var posTrack = new THREE.KeyframeTrack('.position', times, values);
+                    let duration = 101;
+                    let clip = new THREE.AnimationClip("default", duration, [posTrack]);
+
+                    var mixer = new THREE.AnimationMixer(model);
+                    var AnimationAction = mixer.clipAction(clip);
+                    AnimationAction.timeScale = 100;
+                    AnimationAction.play();
+                    var clock = new THREE.Clock();
+
+                    function renderScene() {
+                        var delta = clock.getDelta();
+                        trackballControls.update(delta);
+                        renderer.render(scene, camera);
+                        requestAnimationFrame(renderScene);
+                        mixer.update(clock.getDelta());
+                    }
+
+                    renderScene();
+
+                });
+                Loadmodel(function (model) {
+                    scene.add(model);
+                    model.rotation.x = -0.25 * Math.PI;
+                    model.position.x = 5.868432853635056;
+                    model.position.y = 10;
+                    model.position.z = 7.173030358022544;
+                    model.scale.set(0.015, 0.015, 0.015);
+                    flymachine1 = model;
+
+                    let arr = [];
+                    for (let i = 0; i < 101; i++) {
+                        arr.push(i)
+                    }//生成一个时间序列
+                    var times = new Float32Array(arr);
+
+                    var posArr2 = [];
+                    points2.forEach(elem => {
+                        posArr2.push(elem.x, elem.y, elem.z)
+                    });
+                    // 创建一个和时间序列相对应的位置坐标系列
+                    var values = new Float32Array(posArr2);
+                    // 创建一个帧动画的关键帧数据，曲线上的位置序列对应一个时间序列
+                    var posTrack = new THREE.KeyframeTrack('.position', times, values);
+                    let duration = 101;
+                    let clip = new THREE.AnimationClip("default", duration, [posTrack]);
+
+                    var mixer = new THREE.AnimationMixer(model);
+                    var AnimationAction = mixer.clipAction(clip);
+                    AnimationAction.timeScale = 100;
+                    AnimationAction.play();
+                    var clock = new THREE.Clock();
+
+                    function renderScene() {
+                        var delta = clock.getDelta();
+                        trackballControls.update(delta);
+                        renderer.render(scene, camera);
+                        requestAnimationFrame(renderScene);
+                        mixer.update(clock.getDelta());
+                    }
+
+                    renderScene();
+
+                });
+                Loadmodel(function (model) {
+                    scene.add(model);
+                    model.rotation.x = -0.25 * Math.PI;
+                    model.position.x =8.447858721125215;
+                    model.position.y = 10;
+                    model.position.z = 5.338329644792722;
+                    model.scale.set(0.015, 0.015, 0.015);
+                    flymachine1 = model;
+
+                    let arr = [];
+                    for (let i = 0; i < 101; i++) {
+                        arr.push(i)
+                    }//生成一个时间序列
+                    var times = new Float32Array(arr);
+
+                    var posArr2 = [];
+                    points2.forEach(elem => {
+                        posArr2.push(elem.x, elem.y, elem.z)
+                    });
+                    // 创建一个和时间序列相对应的位置坐标系列
+                    var values = new Float32Array(posArr2);
+                    // 创建一个帧动画的关键帧数据，曲线上的位置序列对应一个时间序列
+                    var posTrack = new THREE.KeyframeTrack('.position', times, values);
+                    let duration = 101;
+                    let clip = new THREE.AnimationClip("default", duration, [posTrack]);
+
+                    var mixer = new THREE.AnimationMixer(model);
+                    var AnimationAction = mixer.clipAction(clip);
+                    AnimationAction.timeScale = 100;
+                    AnimationAction.play();
+                    var clock = new THREE.Clock();
+
+                    function renderScene() {
+                        var delta = clock.getDelta();
+                        trackballControls.update(delta);
+                        renderer.render(scene, camera);
+                        requestAnimationFrame(renderScene);
+                        mixer.update(clock.getDelta());
+                    }
+
+                    renderScene();
+
+                });
+                Loadmodel(function (model) {
+                    scene.add(model);
+                    model.rotation.x = -0.25 * Math.PI;
+                    model.position.x = 11.432358896870056;
+                    model.position.y = 10;
+                    model.position.z = 5.3466957358352545;
+                    model.scale.set(0.015, 0.015, 0.015);
+                    flymachine1 = model;
+
+                    let arr = [];
+                    for (let i = 0; i < 101; i++) {
+                        arr.push(i)
+                    }//生成一个时间序列
+                    var times = new Float32Array(arr);
+
+                    var posArr2 = [];
+                    points2.forEach(elem => {
+                        posArr2.push(elem.x, elem.y, elem.z)
+                    });
+                    // 创建一个和时间序列相对应的位置坐标系列
+                    var values = new Float32Array(posArr2);
+                    // 创建一个帧动画的关键帧数据，曲线上的位置序列对应一个时间序列
+                    var posTrack = new THREE.KeyframeTrack('.position', times, values);
+                    let duration = 101;
+                    let clip = new THREE.AnimationClip("default", duration, [posTrack]);
+
+                    var mixer = new THREE.AnimationMixer(model);
+                    var AnimationAction = mixer.clipAction(clip);
+                    AnimationAction.timeScale = 100;
+                    AnimationAction.play();
+                    var clock = new THREE.Clock();
+
+                    function renderScene() {
+                        var delta = clock.getDelta();
+                        trackballControls.update(delta);
+                        renderer.render(scene, camera);
+                        requestAnimationFrame(renderScene);
+                        mixer.update(clock.getDelta());
+                    }
+
+                    renderScene();
+
+                });
+
+
+                //渲染视图视角
+                camera.position.x = 20;
+                camera.position.y = 20;
+                camera.position.z = 50;
+                camera.lookAt(scene.position)
+                $("#WebGL-output").append(renderer.domElement)
+
+
+            }
+
+            window.onload = init();
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实验一</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/experConfig.css">
+    <link rel="stylesheet" href="css/window.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/define.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/experConfig.js"></script>
+</head>
+
+<body
+    style="background: url(images/fly.jpeg) no-repeat center/100%; background-position: top center; overflow: hidden;">
+    <div class="w">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header_left"
+                style="float: left; top:30; background: url(images/logo-mini.png) no-repeat; width: 300px; height: 50px;">
+                <ul>
+                    <li><a href="knowledge_angle.html" target="_Blank">知识角</a></li>
+                    <li class="kno_hint"> <a href="kno_hint.html" target="_Blank" style>
+                            <p>实验报告</p>
+                        </a></li>
+                </ul>
+            </div>
+
+            <div class="header_middle">
+                <ul class="tab_list">
+                    <li class="exper_intro">
+                        <a href="javascript:;">实验简介</a>
+                    </li>
+                    <li></li>
+                    <li class="exper_choose">
+                        <a href="javascript:;">无人机集群组网协同实验</a>
+                        <ul>
+                            <li><a href="experConfig.html" style="font-size: 14px;">1.1 编队变化下的组网协同</a></li>
+                            <li><a href="experConfig.html" style="font-size: 14px;">1.2 自主避障下的组网协同</a></li>
+                        </ul>
+                    </li>
+                    <li></li>
+                    <li class="exper_choose">
+                        <a href="javascript:;">无人机集群信号欺骗实验</a>
+                        <ul>
+                            <li><a href="experConfig.html" style="font-size: 14px;">2.1 编队变化下的信号欺骗</a></li>
+                            <li><a href="experConfig.html" style="font-size: 14px;">2.2 自主避障下的信号欺骗</a></li>
+                        </ul>
+                    </li>
+                    <li></li>
+                    <li class="exper_choose">
+                        <a href="javascript:;">无人机集群网络攻击实验</a>
+                        <ul>
+                            <li><a href="experConfig.html" style="font-size: 14px;">3.1 编队变化下的网络攻击</a></li>
+                            <li><a href="experConfig.html" style="font-size: 14px;">3.2 自主避障下的网络攻击</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="header_right">
+                <ul>
+                    <li class="start" stylep="width: 75px; margin:10px 3px">
+                        <p>开始仿真</p>
+                    </li>
+                    <li class="suspend" style="width: 50px; margin:10px 3px">
+                        <p>暂停</p>
+                    </li>
+                    <li class=" exit" style="width: 75px; margin:10px -3px">
+                        <span>退出</span>
+                    </li>
+                </ul>
+            </div>
+        </header>
+        <!-- 主体 -->
+        <div class="major">
+            <div class="major_left">
+                <h3>实验步骤</h3>
+                <ul class="exper_guide">
+                    <li>
+                        <div class="exper_guide_title" value="0">第一步(初始配置)</div>
+                        <div id="guide_0" class="exper_guide_con" >
+                            <!-- <p class="exper_guide_content"></p> -->
+                        </div>
+                    </li>
+                    <li>
+                        <div class="exper_guide_title" value="1">第二步(配置二)</div>
+                        <div id="guide_1" class="exper_guide_con">
+                            <!-- <p class="exper_guide_content"></p> -->
+                        </div>
+                    </li>
+                    <li>
+                        <div class="exper_guide_title" value="2">第三步(配置三)</div>
+                        <div id="guide_2" class="exper_guide_con">
+                            <!-- <p class="exper_guide_content"></p> -->
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 尾部 -->
+        <footer class="footer">
+            <div>
+                <ul>
+                    <li class="contro">协同控制模型配置</li>
+                    <li class="net">集群组网配置</li>
+                    <li class="gps">GPS欺骗配置</li>
+                    <li class="attack">网络攻击配置</li>
+                </ul>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 信息提示模板 -->
+    <div class="kno_window">
+        <div id="kno_title" class="kno_title">
+            <p>知识提示</p>
+            <span>
+                <a href="javascript:void(0);" class="kno_close_login">关闭</a>
+            </span>
+        </div>
+        <div class="kno_content">
+            <p class="kno_content_detail">
+                实验。。。。
+            </p>
+        </div>
+        <div class="kno_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+    <!-- 场景配置模板 -->
+    <div class="scene_config">
+        <img src="images/circleFly.png" alt=""
+            style="width: 100% ;height: 100%;position: absolute; opacity: 0.3;z-index: -1;">
+        <div class="scene_config_title">
+            <p>场景配置</p>
+            <span><a href="javascript:void(0);" class="scene_config_close_login">关闭</a>
+            </span>
+        </div>
+        <div class="scene_config_content">
+            <ul class="scene_content_choose">
+                <li value="1">场景一</li>
+                <!-- <li value="2">场景二(预留)</li> -->
+            </ul>
+            <ul class="scene_content_show">
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+        </div>
+        <div class="scene_config_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+
+    <!-- 控制协同模型配置 -->
+    <div class="contro_config contro_0">
+        <img src="images/oneFly.png" alt=""
+            style="width: 100% ;height: 100%;position: absolute; opacity: 0.3;z-index: -1;">
+        <div class="contro_config_title">
+            <p>控制协同模型配置</p>
+            <span><a href="javascript:void(0);" class="contro_config_close_login">关闭</a>
+            </span>
+        </div>
+        <div class="contro_config_content">
+            <p style="float:left; ">平衡距离(m):</p>
+            <select style="float: left;">
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+            </select>
+            <p style="float: left;">最大感知距离(m):</p>
+            <select>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="45">45</option>
+                <option value="50">50</option>
+            </select>
+            <p style="float: left; margin-left: 42px; margin-top: 30px">排斥强度:</p>
+            <select>
+                <option value="0">0</option>
+                <option value="0.1">0.1</option>
+                <option value="1">1</option>
+                <option value="6">6</option>
+                <option value="10">10</option>
+            </select>
+            <p style="float: left; margin-left: 75px;margin-top: 30px">对齐强度:</p>
+            <select>
+                <option value="0.1">0.1</option>
+                <option value="10">10</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+            </select>
+            <p style="float: left; margin-left: 42px; margin-top: 30px">编队强度:</p>
+            <select>
+                <option value="0.1">0.1</option>
+                <option value="0.5">0.5</option>
+                <option value="1">1</option>
+                <option value="1.5">1.5</option>
+                <option value="2">2</option>
+            </select>
+            <p style="float: left;margin-left: 75px;margin-top: 30px;">目标强度:</p>
+            <select>
+                <option value="0.1">0.1</option>
+                <option value="0.5">0.5</option>
+                <option value="1">1</option>
+                <option value="1.5">1.5</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+            </select>
+        </div>
+        <div class="contro_config_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+    <!-- 组网配置 -->
+    <div class="net_config net_0">
+        <img src="images/network.png" alt=""
+            style="width: 100% ;height: 100%;position: absolute; opacity: 0.3;z-index: -1;">
+        <div class="net_config_title">
+            <p>集群组网配置</p>
+            <span><a href="javascript:void(0);" class="net_config_close_login">关闭</a>
+            </span>
+        </div>
+        <div class="net_config_content">
+
+            <p style="float: left; ">通信间隔(s):</p>
+            <select>
+                <option value="0.2">0.2</option>
+                <option value="0.4">0.4</option>
+                <option value="0.6">0.6</option>
+            </select>
+
+            <p style="float: left; margin-left: 50px">通信距离(m):</p>
+            <select>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="40">40</option>
+                <option value="60">60</option>
+            </select>
+
+            <p style="float:left; float:left; margin-left: 35px">路由协议:</p>
+            <select style="float: left;">
+                <option value="AODV">AODV</option>
+                <option value="静态路由">静态路由</option>
+            </select>
+
+            <p style="float:left; float:left; margin-left: 16px">传输速率(Mbps):</p>
+            <select style="float: left;">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="5.5">5.5</option>
+                <option value="11">11</option>
+            </select>
+        </div>
+        <div class="net_config_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+
+    <!-- 控制协同模型配置 -->
+    <div class="contro_config contro_1">
+        <img src="images/oneFly.png" alt=""
+            style="width: 100% ;height: 100%;position: absolute; opacity: 0.3;z-index: -1;">
+        <div class="contro_config_title">
+            <p>控制协同模型配置</p>
+            <span><a href="javascript:void(0);" class="contro_config_close_login">关闭</a>
+            </span>
+        </div>
+        <div class="contro_config_content">
+            <p style="float:left; ">平衡距离(m):</p>
+            <select style="float: left;">
+                <option value="3">3</option>
+                <option value="3.5">3.5</option>
+                <option value="4">4</option>
+                <option value="4.5">4.5</option>
+            </select>
+            <p style="float: left;">最大感知距离(m):</p>
+            <select>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="40">40</option>
+                <option value="50">50</option>
+            </select>
+            <p style="float: left; margin-left: 42px; margin-top: 30px">排斥强度:</p>
+            <select>
+                <option value="0">0</option>
+                <option value="0.1">0.1</option>
+                <option value="1">1</option>
+                <option value="6">6</option>
+                <option value="10">10</option>
+            </select>
+            <p style="float: left; margin-left: 75px;margin-top: 30px">对齐强度:</p>
+            <select>
+                <option value="0.1">0.1</option>
+                <option value="10">10</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+            </select>
+            <p style="float: left; margin-left: 42px;margin-top: 30px">编队强度:</p>
+            <select>
+                <option value="0.1">0.1</option>
+                <option value="0.5">0.5</option>
+                <option value="1">1</option>
+                <option value="1.5">1.5</option>
+                <option value="2">2</option>
+            </select>
+            <p style="float: left; margin-left: 75px;margin-top: 30px">目标强度:</p>
+            <select>
+                <option value="0.1">0.1</option>
+                <option value="0.5">0.5</option>
+                <option value="1">1</option>
+                <option value="1.5">1.5</option>
+                <option value="2.1">2.1</option>
+                <option value="3">3</option>
+            </select>
+        </div>
+        <div class="contro_config_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+    <!-- 组网配置 -->
+    <div class="net_config net_1">
+        <img src="images/network.png" alt=""
+            style="width: 100% ;height: 100%;position: absolute; opacity: 0.3;z-index: -1;">
+        <div class="net_config_title">
+            <p>集群组网配置</p>
+            <span><a href="javascript:void(0);" class="net_config_close_login">关闭</a>
+            </span>
+        </div>
+        <div class="net_config_content">
+
+            <p style="float: left; ">通信间隔(s):</p>
+            <select>
+                <option value="0.2">0.2</option>
+                <option value="0.4">0.4</option>
+                <option value="0.6">0.6</option>
+            </select>
+
+            <p style="float: left; margin-left: 50px">通信距离(m):</p>
+            <select>
+                <option value="8">8</option>
+                <option value="12">12</option>
+                <option value="16">16</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+            </select>
+
+            <p style="float:left; margin-left: 35px">路由协议:</p>
+            <select style="float: left;">
+                <option value="AODV">AODV</option>
+                <option value="静态路由">静态路由</option>
+            </select>
+
+            <p style="float:left; float:left; margin-left: 16px">传输速率(Mbps):</p>
+            <select style="float: left;">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="5.5">5.5</option>
+                <option value="11">11</option>
+            </select>
+
+        </div>
+        <div class="net_config_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+    <!-- 控制协同模型配置 -->
+    <div class="contro_config contro_2">
+        <img src="images/oneFly.png" alt=""
+            style="width: 100% ;height: 100%;position: absolute; opacity: 0.3;z-index: -1;">
+        <div class="contro_config_title">
+            <p>控制协同模型配置</p>
+            <span><a href="javascript:void(0);" class="contro_config_close_login">关闭</a>
+            </span>
+        </div>
+        <div class="contro_config_content">
+            <p style="float:left; ">平衡距离(m):</p>
+            <select style="float: left;">
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+            </select>
+            <p style="float: left;">最大感知距离(m):</p>
+            <select>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="25">25</option>
+                <option value="30">30</option>
+                <option value="40">40</option>
+            </select>
+            <p style="float: left; margin-left: 42px; margin-top: 30px">排斥强度:</p>
+            <select>
+                <option value="0">0</option>
+                <option value="0.1">0.1</option>
+                <option value="1">1</option>
+                <option value="3">3</option>
+
+                <option value="6">6</option>
+                <option value="10">10</option>
+            </select>
+            <p style="float: left; margin-left: 75px;margin-top: 30px">对齐强度:</p>
+            <select>
+                <option value="0.1">0.1</option>
+                <option value="10">10</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+            </select>
+            <p style="float: left; margin-left: 42px; margin-top: 30px">编队强度:</p>
+            <select>
+                <option value="0.1">0.1</option>
+                <option value="0.5">0.5</option>
+                <option value="1">1</option>
+                <option value="1.5">1.5</option>
+                <option value="2">2</option>
+            </select>
+            <p style="float: left;margin-left: 75px;margin-top: 30px;">目标强度:</p>
+            <select>
+                <option value="0.1">0.1</option>
+                <option value="0.5">0.5</option>
+                <option value="1">1</option>
+                <option value="1.5">1.5</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+            </select>
+        </div>
+        <div class="contro_config_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+    <!-- GPS欺骗配置 -->
+    <div class="gps_config gps_0">
+        <img src="images/network.png" alt=""
+            style="width: 100% ;height: 100%;position: absolute; opacity: 0.3;z-index: -1;">
+        <div class="gps_config_title">
+            <p>GPS欺骗配置</p>
+            <span><a href="javascript:void(0);" class="gps_config_close_login">关闭</a>
+            </span>
+        </div>
+        <div class="gps_config_content">
+
+            <p style="float:left; ">路由协议:</p>
+            <select style="float: left;">
+                <option value="AODV">AODV</option>
+            </select>
+
+            <p style="float: left;">通信距离:</p>
+            <select>
+                <option value="8">8</option>
+                <option value="10">10</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+
+            </select>
+
+            <p style="float: left;">欺骗数量:</p>
+            <select class="gps_number">
+                <option value="2">2</option>
+                <option value="4">4</option>
+            </select>
+
+            <p style="float: left;">欺骗节点:</p>
+            <select class="gps_node_0">
+                <option value="5，6">5,6</option>
+                <option value="4，5">4,5</option>
+            </select>
+
+            <p style="float: left; ">欺骗均值:</p>
+            <select>
+                <option value="0">0</option>
+                <option value="50">50</option>
+                <option value="150">150</option>
+                <option value="250">250</option>
+                <option value="500">500</option>
+                <option value="550">550</option>
+            </select>
+
+            <p style="float: left; ">欺骗方差:</p>
+            <select>
+                <option value="0">0</option>
+                <option value="0.01">0.01</option>
+                <option value="0.05">0.05</option>
+                <option value="0.1">0.1</option>
+                <option value="0.5">0.5</option>
+                <option value="0.7">0.7</option>
+            </select>
+        </div>
+        <div class="gps_config_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+
+    <!-- 控制协同模型配置 -->
+    <div class="contro_config contro_3">
+        <img src="images/oneFly.png" alt=""
+            style="width: 100% ;height: 100%;position: absolute; opacity: 0.3;z-index: -1;">
+        <div class="contro_config_title">
+            <p>控制协同模型配置</p>
+            <span><a href="javascript:void(0);" class="contro_config_close_login">关闭</a>
+            </span>
+        </div>
+        <div class="contro_config_content">
+            <p style="float:left; ">平衡距离(m):</p>
+            <select style="float: left;">
+                <option value="3">3</option>
+                <option value="5">5</option>
+                <option value="7">7</option>
+                <option value="9">9</option>
+            </select>
+            <p style="float: left;">最大感知距离(m):</p>
+            <select>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="25">25</option>
+                <option value="30">30</option>
+                <option value="40">40</option>
+            </select>
+            <p style="float: left; margin-left: 42px; margin-top: 30px">排斥强度:</p>
+            <select>
+                <option value="0">0</option>
+                <option value="0.1">0.1</option>
+                <option value="1">1</option>
+                <option value="5">5</option>
+                <option value="4">4</option>
+                <option value="10">10</option>
+            </select>
+            <p style="float: left; margin-left: 75px;margin-top: 30px">对齐强度:</p>
+            <select>
+                <option value="0.1">0.1</option>
+                <option value="10">10</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+            </select>
+            <p style="float: left; margin-left: 42px; margin-top: 30px">编队强度:</p>
+            <select>
+                <option value="0.1">0.1</option>
+                <option value="0.5">0.5</option>
+                <option value="1">1</option>
+                <option value="1.5">1.5</option>
+                <option value="2">2</option>
+            </select>
+            <p style="float: left;margin-left: 75px;margin-top: 30px;">目标强度:</p>
+            <select>
+                <option value="0.1">0.1</option>
+                <option value="0.5">0.5</option>
+                <option value="1">1</option>
+                <option value="1.5">1.5</option>
+                <option value="2">2</option>
+            </select>
+        </div>
+        <div class="contro_config_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+
+    <!-- GPS欺骗配置 -->
+    <div class="gps_config gps_1">
+        <img src="images/network.png" alt=""
+            style="width: 100% ;height: 100%;position: absolute; opacity: 0.3;z-index: -1;">
+        <div class="gps_config_title">
+            <p>GPS欺骗配置</p>
+            <span><a href="javascript:void(0);" class="gps_config_close_login">关闭</a>
+            </span>
+        </div>
+        <div class="gps_config_content">
+
+            <p style="float:left; ">路由协议:</p>
+            <select style="float: left;">
+                <option value="AODV">AODV</option>
+            </select>
+
+            <p style="float: left;">通信距离:</p>
+            <select>
+                <option value="8">8</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+
+            </select>
+
+            <p style="float: left; ">欺骗数量:</p>
+            <select class="gps_number">
+                <option value="2">2</option>
+                <option value="4">4</option>
+            </select>
+
+            <p style="float: left; ">欺骗节点:</p>
+            <select class="gps_node_1">
+                <option value="0，1">0,1</option>
+                <option value="0，3">0,3</option>
+            </select>
+
+            <p style="float: left; ">欺骗均值:</p>
+            <select>
+                <option value="0">0</option>
+                <option value="50">50</option>
+                <option value="150">150</option>
+                <option value="250">250</option>
+                <option value="350">350</option>
+                <option value="500">500</option>
+                <option value="550">550</option>
+
+            </select>
+
+            <p style="float: left; ">欺骗方差:</p>
+            <select>
+                <option value="0">0</option>
+                <option value="0.01">0.01</option>
+                <option value="0.1">0.1</option>
+                <option value="0.5">0.5</option>
+                <option value="0.7">0.7</option>
+            </select>
+
+        </div>
+        <div class="gps_config_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+    <!-- 控制协同模型配置 -->
+    <div class="contro_config contro_4">
+        <img src="images/oneFly.png" alt=""
+            style="width: 100% ;height: 100%;position: absolute; opacity: 0.3;z-index: -1;">
+        <div class="contro_config_title">
+            <p>控制协同模型配置</p>
+            <span><a href="javascript:void(0);" class="contro_config_close_login">关闭</a>
+            </span>
+        </div>
+        <div class="contro_config_content">
+            <p style="float:left; ">平衡距离(m):</p>
+            <select style="float: left;">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+            </select>
+            <p style="float: left;">最大感知距离(m):</p>
+            <select>
+                <option value="20">20</option>
+                <option value="25">25</option>
+                <option value="30">30</option>
+                <option value="35">35</option>
+                <option value="40">40</option>
+            </select>
+            <p style="float: left; margin-left: 42px; margin-top: 30px">排斥强度:</p>
+            <select>
+                <option value="0">0</option>
+                <option value="0.1">0.1</option>
+                <option value="1">1</option>
+                <option value="6">6</option>
+                <option value="10">10</option>
+            </select>
+            <p style="float: left; margin-left: 75px;margin-top: 30px">对齐强度:</p>
+            <select>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+            </select>
+            <p style="float: left; margin-left: 42px; margin-top: 30px">编队强度:</p>
+            <select>
+                <option value="0.1">0.1</option>
+                <option value="0.5">0.5</option>
+                <option value="1">1</option>
+                <option value=1.5>1.5</option>
+                <option value="2">2</option>
+            </select>
+            <p style="float: left;margin-left: 75px;margin-top: 30px;">目标强度:</p>
+            <select>
+                <option value="0.1">0.1</option>
+                <option value="0.5">0.5</option>
+                <option value="1">1</option>
+                <option value="1.5">1.5</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+            </select>
+        </div>
+        <div class="contro_config_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+    <!-- 网络攻击配置 -->
+    <div class="attack_config attack_0 " style="display: none">
+        <img src="images/network.png" alt=""
+            style="width: 100% ;height: 100%;position: absolute; opacity: 0.3;z-index: -1;">
+        <div class="attack_config_title">
+            <p>网络攻击配置</p>
+            <span><a href="javascript:void(0);" class="attack_config_close_login">关闭</a>
+            </span>
+        </div>
+        <div class="attack_config_content">
+
+            <p style="float:left; ">路由协议:</p>
+            <select style="float: left;">
+                <option value="AODV">AODV</option>
+            </select>
+
+            <p style="float: left;">通信距离:</p>
+            <select>
+                <option value="10">10</option>
+                <option value="15">15</option>
+            </select>
+
+            <p style="float: left;">攻击数量:</p>
+            <select class="attack_number_0">
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>
+
+            <p style="float: left;">攻击节点:</p>
+            <select class="attack_node_0">
+                <option value="0，2，6，8">0,2,6,8</option>
+                <option value="1，3，5，7">1,3,5,7</option>
+            </select>
+
+            <p style="float: left;">攻击方式:</p>
+            <select>
+                <option value="无攻击">无攻击</option>
+                <option value="黑洞攻击">黑洞攻击</option>
+            </select>
+
+            <p style="float: left; margin-left: 60px;">丢弃率:</p>
+            <select>
+                <option value="50%">50%</option>
+                <option value="100%">100%</option>
+            </select>
+        </div>
+        <div class="attack_config_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+
+
+
+    <!-- 控制协同模型配置 -->
+    <div class="contro_config contro_5">
+        <img src="images/oneFly.png" alt=""
+            style="width: 100% ;height: 100%;position: absolute; opacity: 0.3;z-index: -1;">
+        <div class="contro_config_title">
+            <p>控制协同模型配置</p>
+            <span><a href="javascript:void(0);" class="contro_config_close_login">关闭</a>
+            </span>
+        </div>
+        <div class="contro_config_content">
+            <p style="float:left; ">平衡距离(m):</p>
+            <select style="float: left;">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+            <p style="float: left;">最大感知距离(m):</p>
+            <select>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="25">25</option>
+                <option value="30">30</option>
+                <option value="35">35</option>
+            </select>
+            <p style="float: left; margin-left: 42px; margin-top: 30px">排斥强度:</p>
+            <select>
+                <option value="0">0</option>
+                <option value="0.1">0.1</option>
+                <option value="1">1</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+            </select>
+            <p style="float: left; margin-left: 75px;margin-top: 30px">对齐强度:</p>
+            <select>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+            </select>
+            <p style="float: left; margin-left: 42px; margin-top: 30px">编队强度:</p>
+            <select>
+                <option value="0.1">0.1</option>
+                <option value="0.5">0.5</option>
+                <option value="1">1</option>
+                <option value=1.5>1.5</option>
+                <option value="2">2</option>
+            </select>
+            <p style="float: left;margin-left: 75px;margin-top: 30px;">目标强度:</p>
+            <select>
+                <option value="0.1">0.1</option>
+                <option value="0.5">0.5</option>
+                <option value="1">1</option>
+                <option value="1.5">1.5</option>
+                <option value="2">2</option>
+            </select>
+        </div>
+        <div class="contro_config_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+    <!-- 网络攻击配置 -->
+    <div class="attack_config attack_1">
+        <img src="images/network.png" alt=""
+            style="width: 100% ;height: 100%;position: absolute; opacity: 0.3;z-index: -1;">
+        <div class="attack_config_title">
+            <p>网络攻击配置</p>
+            <span><a href="javascript:void(0);" class="attack_config_close_login">关闭</a>
+            </span>
+        </div>
+        <div class="attack_config_content">
+
+            <p style="float:left; ">路由协议:</p>
+            <select style="float: left;">
+                <option value="AODV">AODV</option>
+            </select>
+
+            <p style="float: left;">通信距离:</p>
+            <select>
+                <option value="10">10</option>
+                <option value="15">15</option>
+            </select>
+
+            <p style="float: left;">攻击数量:</p>
+            <select class="attack_number_1">
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>
+
+            <p style="float: left;">攻击节点:</p>
+            <select class="attack_node_1">
+                <option value="0，2，6，8">0,2,6,8</option>
+                <option value="1，3，5，7">1,3,5,7</option>
+                <!-- <option value="1，5，3，7" style="display: none">1,3,7</option> -->
+            </select>
+
+            <p style="float: left;">攻击方式:</p>
+            <select>
+                <option value="无攻击">无攻击</option>
+                <option value="黑洞攻击">黑洞攻击</option>
+            </select>
+
+            <p style="float: left; margin-left: 60px;">丢弃率:</p>
+            <select>
+                <option value="50%">50%</option>
+                <option value="100%">100%</option>
+            </select>
+        </div>
+        <div class="attack_config_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+    <!-- 实验步骤提示窗口 -->
+    <div class="process_window popup_window" style="display: block;">
+        <p></p>
+        <div class=" process_content popup_window_content">
+            <p></p>
+        </div>
+        <div class="process_login_button popup_window_login_button">
+            <a href="javascript:void(0);">确认</a>
+        </div>
+    </div>
+
+    <!-- 实验简介 -->
+    <div class="intro_window popup_window">
+        <p></p>
+        <div class="intro_content popup_window_content">
+            <p></p>
+        </div>
+        <div class="intro_button popup_window_login_button">
+            <a href="javascript:void(0);">确认</a>
+        </div>
+    </div>
+
+    <!-- 选择实验窗口 -->
+    <div class="choose_window popup_window" style="display:none;">
+        <p></p>
+        <div class="choose_content popup_window_content">
+            <p></p>
+        </div>
+        <div class="choose_button popup_window_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+</body>
+
+</html>

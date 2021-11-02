@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网络黑洞攻击</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/common.css">
+    <style>
+        p {
+            color: black;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body style="background-color: #F0F0F0;">
+    <div class="w">
+        <h2 style=" color: black;">网络黑洞攻击</h2>
+        <p style="text-indent: 2em;">
+            1) 黑洞攻击原理：黑洞攻击是一种发动于网络内部，依靠网络内部的某些节点的主动的网络攻击。Ad
+            Hoc网络中的黑洞攻击节点对收到的每个路由请求报文都回复一个虚拟的路由响应报文，以表明该节点有一条到达目的节点的最短路由。由于黑洞攻击节点回复路由响应时省略了许多中间环节，因此它的路由响应往往会最先到达源节点。收到该回复的源节点则很可能就此建立错误的路由，把黑洞攻击节点作为路由路径中的中间节点，将数据包传送过去。此时，攻击节点只需要将收到的数据包统统销毁，就会在网络中形成一个吞噬数据包的黑洞，从而破坏协议的正常功能，甚至使网络瘫痪。它有两个属性：第一，攻击者在没有任何转发的情况下消耗被拦截的数据包。第二，节点利用移动自组织路由协议，宣布自己拥有到目的地节点的准确路由，但是该路由是伪造的，意图是拦截数据包。
+        </p>
+
+        <p style="text-indent: 2em;">
+            2).黑洞攻击实现过程：如图8所示，假设采取单恶意节点的攻击方式，节点M是黑洞节点，A向节点E发起通信，向所有邻近节点发送RREQ。而M节点只要接收到来自A节点的RREQ包，它就声称拥有到目标节点的路由，并立即将响应包RREP发送到源节点。如果来自普通目的地节点的应答首先到达RREQ的源节点，那么一切都正常；如果M更接近源节点，那么来自M的应答可以首先到达源节点（所以黑洞节点的位置是影响攻击效果的一个重要因素）。此外，M在发送假消息时不需要检查它的路由表，它的响应更有可能首先到达源节点A。这使得源节点A认为路由发现过程已完成，忽略所有其他回复消息，并开始发送数据包。结果，通过M的所有包都被简单地消耗或丢失。可以说M在网络中形成了一个黑洞，我们称之为黑洞攻击。
+        </p>
+
+        <div style=" width: 500px; height: 300px; margin-left:30%;margin-top: 10px;"><img src="exper_img/8.png" alt=""
+                style="width: 100%; height: 100%;">
+        </div>
+        <p style="text-align: center; margin-bottom: 10px;">图8. 黑洞攻击原理图</p>
+
+
+        <p style="text-indent: 2em;">
+            在仿真过程中，如图9所示，红色的无人机表示是受到黑洞攻击的无人机（即黑洞节点），蓝色的无人机是未受到网络攻击的无人机。
+        </p>
+
+        </p>
+        <div style=" width: 400px; height: 300px; margin-left:35%;margin-top: 10px;"><img src="exper_img/9.png" alt=""
+                style="width: 100%; height: 100%;">
+        </div>
+        <p style="text-align: center; margin-bottom: 10px;">图9. 仿真中的黑洞攻击示意图</p>
+
+        <p style="text-indent: 2em;">
+            在仿真中可配置的黑洞攻击参数如下：
+        </p>
+
+        <p style="text-indent: 2em;">
+            丢弃率（用于控制黑洞节点的无人机丢弃收到的数据包的概率）表示
+            黑洞节点丢弃接收到的数据包的概率；攻击数量（用于控制无人机编队中黑洞节点的数量）；攻击位置（用于控制黑洞节点在无人机编队中的位置）。
+        </p>
+    </div>
+</body>
+
+</html>

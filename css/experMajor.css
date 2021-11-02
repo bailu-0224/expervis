@@ -1,0 +1,447 @@
+/* 实验步骤模块 */
+.exper_guide {
+    position: absolute;
+    display: none;
+    z-index: 3;
+}
+.exper_guide  p {
+    color: #fff;
+}
+.exper_guide_title{
+    width: 250px;
+    height: 22px;
+    text-align: center;
+    line-height: 22px;
+    background-color: rgba(0, 0, 0, .8);
+    font-size: 16px;
+    margin: 2px;
+    cursor: pointer;
+}
+.exper_guide_content{
+    display: block;
+    padding:0 2em;
+    /* text-align: center; */
+    width: 100%;
+    font-size: 14px;
+    background-color: #666666;
+    color: #ffffff;
+}
+
+/* 选择转换功能 */
+.switch_panel{
+    height: 30px;
+    margin: 3px 10px;
+    background-color: rgba(0, 0, 0, .8);
+    border-radius: 20px;
+}
+.switch_panel p{
+    margin-left: 5px;
+    font-size: 14px;
+    line-height: 28px;
+    color: #fff;
+}
+select{
+    width: 100px;
+    height: 25px;
+    margin-top: 2px;
+    margin-left: 3px;
+    margin-right: 20px;
+    background-color: #333333; 
+    border: 0px;
+    color: #fff;
+}
+
+/* 场景配置 */
+.scene_config{
+    display: none;
+    position: fixed;
+    width: 600px;
+    height: 350px;
+    left: 50%;
+    top: 350px;
+    background-color:rgba(0, 0, 0, .8);
+    box-shadow: 0px 0px 30px rgba(0, 0, 0, 3);
+    border-radius: 56px;
+    transform: translate(-50%, -50%);
+}
+.scene_config_title{
+    position: relative;
+    width: 100%;
+    margin: 10px 0px 0px 0px;
+    text-align: center;
+    line-height: 40px;
+    height: 40px;
+    color: #ffffff;
+}
+.scene_config_title>p {
+    font-size: 24px;
+}
+.scene_config_title span {
+    position: absolute;
+    font-size: 12px;
+    right: -20px;
+    top: -30px;
+    background: #90979c;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+}
+.scene_config_title span:hover a{
+    color: #ffffff;
+}
+
+.scene_config_content {
+    position: relative;
+    width: 500px;
+    height: 220px;  
+    margin: 10px 30px 5px 55px;
+    border: 1px  solid #ffffff;
+    border-radius: 20px;
+}
+
+.scene_content_choose li {
+    float: left;
+    width: 160px;
+    height: 40px;
+    margin: 10px 40px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 18px;
+    color: #ffffff;
+    background-color: #666666;
+    border-radius: 30px;
+}
+
+.scene_content_show li:first-child {
+    float: left;
+    width: 150px;
+    height: 150px;
+    margin: 10px 20px 10px 40px;
+}
+.scene_content_show li:last-child {
+    float: left;
+    width: 150px;
+    height: 150px;
+    margin: 10px 40px 10px 40px;
+}
+.scene_content_show li:nth-child(even) {
+    float: left;
+    width: 20px;
+    height: 15px;
+    margin: 30px 20px 5px 10px;
+    font-size: 60px;
+    color: #FFCC33;
+    font-family: 'icomoon';
+}
+
+.scene_config_login_button {
+    width: 50%;
+    margin: 10px auto 0px auto;
+    line-height: 40px;
+    font-size: 20px;
+    text-align: center;
+    border-radius: 20px;
+    color: #ffffff;
+    background-color: #90979c;
+}
+.scene_config_login_button a {
+    display: block;
+    color: #666666;
+}
+.scene_config_login_button:hover a{
+    color: #fff;
+}
+
+
+/* 组网与协同配置 */
+.contro_config,
+.net_config,
+.gps_config,
+.attack_config{
+    display: none;
+    position: fixed;
+    width: 600px;
+    height: 350px;
+    left: 50%;
+    top: 350px;
+    background-color:rgba(0, 0, 0, .8);
+    box-shadow: 0px 0px 30px rgba(0, 0, 0, 3);
+    border-radius: 56px;
+    transform: translate(-50%, -50%);
+}
+.contro_config_title,
+.net_config_title,
+.gps_config_title,
+.attack_config_title {
+    position: relative;
+    width: 100%;
+    margin: 10px 0px 0px 0px;
+    text-align: center;
+    line-height: 40px;
+    height: 40px;
+    color: #ffffff;
+}
+.contro_config_title>p,
+.net_config_title>p,
+.gps_config_title>p,
+.attack_config_title>p {
+    font-size: 24px;
+}
+.contro_config_title span,
+.net_config_title span,
+.gps_config_title span,
+.attack_config_title span{
+    position: absolute;
+    font-size: 12px;
+    right: -20px;
+    top: -30px;
+    background: #90979c;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+}
+.contro_config_title span:hover a,
+.net_config_title span:hover a,
+.gps_config_title span:hover a,
+.attack_config_title span:hover a{
+    color: #ffffff;
+}
+
+.contro_config_content,
+.net_config_content,
+.gps_config_content,
+.attack_config_content {
+    position: relative;
+    width: 500px;
+    height: 220px;  
+    margin: 10px 30px 5px 55px;
+    border: 1px  solid #ffffff;
+    border-radius: 20px;
+}
+
+.contro_config_login_button,
+.net_config_login_button,
+.gps_config_login_button,
+.attack_config_login_button {
+    width: 50%;
+    margin: 10px auto 0px auto;
+    line-height: 40px;
+    font-size: 20px;
+    text-align: center;
+    border-radius: 20px;
+    color: #ffffff;
+    background-color: #90979c;
+}
+
+.contro_config_login_button a,
+.net_config_login_button a, 
+.gps_config_login_button a, 
+.attack_config_login_button a{
+    display: block;
+    color: #666666;
+}
+.contro_config_login_button:hover a,
+.net_config_login_button:hover a,
+.gps_config_login_button:hover a,
+.attack_config_login_button:hover a{
+    color: #fff;
+}
+
+
+/* 控制协同内容配置 */
+.contro_config_content p:nth-child(odd) {
+    float: left;
+    margin: 30px 0px -10px 9px;
+    color: #ffffff;
+    font-size: 20px;
+}
+
+.contro_config_content p:nth-child(even) {
+    float: left;
+    margin: 30px 0px 0px 0px;
+    padding-left: 1em;
+    width: 100px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 16px;
+    color: #fff;
+    border: 0.1px solid #dadada;
+    background-color: rgba(0, 0, 0, .8);
+}
+
+/* 组网内容配置 */
+.net_config_content p:nth-child(odd) {
+    float: left;
+    margin: 55px 0px -10px 10px;
+    color: #ffffff;
+    font-size: 20px;
+}
+
+.net_config_content p:nth-child(even) {
+    float: left;
+    margin: 55px 0px  0px 0px;
+    padding-left: 1em;
+    width: 100px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 16px;
+    color: #fff;
+    border: 0.1px solid #dadada;
+    background-color: rgba(0, 0, 0, .8);
+}
+
+/* GPS欺骗配置 */
+.gps_config_content p:nth-child(odd) {
+    float: left;
+    margin: 30px 0px -10px 40px;
+    color: #ffffff;
+    font-size: 20px;
+}
+
+.gps_config_content p:nth-child(even) {
+    float: left;
+    margin: 30px 0px 0px 0px;
+    padding-left: 1em;
+    width: 100px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 16px;
+    color: #fff;
+    border: 0.1px solid #dadada;
+    background-color: rgba(0, 0, 0, .8);
+}
+
+/* 网络攻击配置 */
+.attack_config_content p:nth-child(odd) {
+    float: left;
+    margin: 30px 0px -10px 45px;
+    color: #ffffff;
+    font-size: 20px;
+}
+
+.attack_config_content p:nth-child(even) {
+    float: left;
+    margin: 30px 0px 0px 0px;
+    padding-left: 1em;
+    width: 100px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 16px;
+    color: #fff;
+    border: 0.1px solid #dadada;
+    background-color: rgba(0, 0, 0, .8);
+}
+
+
+/* 重写圆角 */
+.net_config {
+    border-radius: 64px;
+}
+
+
+/* 个体信息模块 */
+.unit {
+    position: absolute;
+    display: none;
+    width: 230px;
+    margin-right: 50px;
+    /* display: none; */
+    border-radius: 20px;
+    margin-left: -5;
+    z-index: 2;
+}
+
+.unit>div {
+    margin-left: 10px;
+    background-color: rgba(0, 0, 0,1.0);
+
+    /* background-color: pink; */
+}
+
+
+ /* 表格 */
+ #unit_1 {
+    overflow-x: auto; 
+    overflow-y: auto;
+}
+
+ #unit_1 table{
+    width:100%;
+    /* padding-left: 10%; */
+    /*background: #bbb;*/
+    text-align:center;
+    border-collapse: collapse;
+}
+
+#unit_1 table thead tr td{
+    height:30px;
+    font-weight: bold;
+    /* border-bottom: 1px solid #FFC125; */
+    /* background-color: pink; */
+ }
+
+ #unit_1 table tbody tr:nth-child(odd){
+    background-color: #1C1C1C;
+}
+#unit_1 table tbody tr:nth-child(even){
+    background-color: #363636;
+}
+
+#unit_1 table tbody tr td{
+    text-align: center;
+}
+
+/* 滚动条 */
+#unit_1::-webkit-scrollbar{
+    width: 10px;     /*高宽分别对应横竖滚动条的尺寸*/
+    height: 1px;
+}
+
+#unit_1::-webkit-scrollbar {/*滚动条整体样式*/
+    width: 10px;     /*高宽分别对应横竖滚动条的尺寸*/
+    height: 1px;
+    border-radius: 20px;
+}
+   
+ #unit_1::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+    border-radius: 10px;
+    box-shadow: inset 0 0 5px rgba(0,0,0,.8);
+    background: #535353;
+    }
+#unit_1::-webkit-scrollbar-track {/*滚动条里面轨道*/
+    box-shadow: inset 0 0 5px rgba(0,0,0,.8);
+    border-radius: 20px;
+    background: black;
+}
+
+
+
+/* 雷达 */
+#unit_3:after {
+    content: ' ';
+    display: block;
+    background-image: linear-gradient(44deg, rgba(0, 255, 51, 0) 50%, #00ff33 100%);
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    top: 7%;
+    left: 17%;
+    animation: radar-beam 4s infinite;
+    animation-timing-function: linear;
+    transform-origin: bottom right;
+    border-radius: 100% 0 0 0;
+  }
+  @keyframes radar-beam {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+
+
+
+
+

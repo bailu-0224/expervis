@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="../Resource/js/three.js" ></script>
+    <script type="text/javascript" src="../Resource/js/TrackballControls.js" ></script>
+    <script type="text/javascript" src="../Resource/js/DDSLoader.js" ></script>
+    <script type="text/javascript" src="../Resource/js/OBJLoader.js" ></script>
+    <script type="text/javascript" src="../Resource/js/OBJMTLLoader.js" ></script>
+    <script type="text/javascript" src="../Resource/js/OrbitControls.js" ></script>
+    <script type="text/javascript" src="../Resource/js/dat.gui.js"></script>
+    <title></title>
+</head>
+<style>
+    body{
+        margin: 0;
+        overflow: hidden;
+    }
+    /*input {*/
+    /*    position: absolute;*/
+    /*    right: 0;*/
+    /*    top: 1px;*/
+    /*}*/
+    #percent {
+        position: absolute;
+        width: 200px;
+        height: 20px;
+        color: red;
+        text-align: center;
+        border: 1px;
+    }
+</style>
+<body>
+<!--<input type="button" value="开始" id="control-btn">-->
+<div id="percent"></div>
+<div id="WebGL-output">
+
+
+</div>
+<script>
+    var plane1;
+    var plane2;
+    var plane3;
+    var plane4;
+    var plane5;
+    var plane6;
+    var plane7;
+    var plane8;
+    var plane9;
+    var plane10;
+    var c=0;
+    var socket;
+    var points1;
+    var points2;
+    var points3;
+    var points4;
+    var points5;
+    var points6;
+    var points7;
+    var points8;
+    var points9;
+    var points10;
+    var num=0;
+    var id;
+    const group = new THREE.Group();
+    var tArray=new Array(10);
+    for(var k=0;k<10;k++)
+        tArray[k]=new Array(10);
+    var connectline = new THREE.Group();
+    function connectServer(callback){
+
+        var socket_ip="127.0.0.1";
+        socket= new WebSocket('ws://'+socket_ip+':9000');
+        socket.onopen = function(event)
+        {
+            console.log("连接服务成功！");
+            sendMsg();
+        };
+        // 监听消息
+        socket.onmessage = function(event)
+        {
+            // console.log('Client received a message',event);
+            // console.log(event.data);
+            if(event.data === "end")
+            {
+                const point = {
+                    points1,
+                    points2,
+                    points3,
+                    points4,
+                    points5,
+                    points6,
+                    points7,
+                    points8,
+                    points9,
+                    points10
+                };
+                console.log(point);
+                callback(point);
+            }
+            else
+            {
+                const mypoints = event.data.split("\\");
+                for(let i=0; i<mypoints.length-1; i++)
+                {
+                    const myVector = mypoints[i].split(" ");
+                    id=parseInt(myVector[0]);
+
+                    // console.log(parseFloat(myVector[0])+"  "+parseFloat(myVector[1]));
+                    switch (id) {
+                        case 0:points1 = new THREE.Vector3(parseFloat(myVector[1]),20,parseFloat(myVector[2]));
+                            break;
+                        case 1:points2 = new THREE.Vector3(parseFloat(myVector[1]),20,parseFloat(myVector[2])) ;
+                            break;
+                        case 2:points3 = new THREE.Vector3(parseFloat(myVector[1]),20,parseFloat(myVector[2])) ;
+                            break;
+                        case 3:points4 = new THREE.Vector3(parseFloat(myVector[1]),20,parseFloat(myVector[2])) ;
+                            break;
+                        case 4:points5 = new THREE.Vector3(parseFloat(myVector[1]),20,parseFloat(myVector[2])) ;
+                            break;
+                        case 5:points6 = new THREE.Vector3(parseFloat(myVector[1]),20,parseFloat(myVector[2])) ;
+                            break;
+                        case 6:points7 = new THREE.Vector3(parseFloat(myVector[1]),20,parseFloat(myVector[2])) ;
+                            break;
+                        case 7:points8 = new THREE.Vector3(parseFloat(myVector[1]),20,parseFloat(myVector[2])) ;
+                            break;
+                        case 8:points9 = new THREE.Vector3(parseFloat(myVector[1]),20,parseFloat(myVector[2])) ;
+                            break;
+                        case 9:points10 = new THREE.Vector3(parseFloat(myVector[1]),20,parseFloat(myVector[2])) ;
+                            break;
+                    }
+                    const connection= myVector[3].split("*");
+                    console.log(connection);
+                    for(let j=0;j<connection.length-1;j++)
+                    {
+                        // console.log(connection[j]);
+                        // console.log(i);
+                        // console.log
+                        tArray[i][j]=parseInt(connection[j]);
+                    }
+                }
+                num++;
+
+            }
+            console.log(tArray);
+            console.log(points2);
+        };
+        // 监听Socket的关闭
+        socket.onclose = function(event)
+        {
+            console.log(event.data);
+        };
+        //监听Socket的出错
+        socket.onerror = function(event)
+        {
+            //alert('无法连接到:' + socket_ip);
+        };
+
+    }
+    function sendMsg(){
+        socket.send("hello！");
+    }
+    function load() {
+
+        Loadmodel(function (model) {
+            let box = new THREE.Box3().setFromObject(model); // 获取模型的包围盒
+            let mdlen = box.max.x - box.min.x; // 模型长度
+            let mdwid = box.max.z - box.min.z; // 模型宽度
+            let mdhei = box.max.y - box.min.y; // 模型高度
+            let x1 = box.min.x + mdlen / 2; // 模型中心点坐标X
+            let y1 = box.min.y + mdhei / 2; // 模型中心点坐标Y
+            let z1 = box.min.z + mdwid / 2; // 模型中心点坐标Z
+            model.position.set(-x1, -y1, -z1); // 将模型进行偏移
+            model.scale.set(0.015, 0.015, 0.015);
+            plane1=model;
+            group.add(plane1);
+        });
+        Loadmodel(function (model) {
+            let box = new THREE.Box3().setFromObject(model); // 获取模型的包围盒
+            let mdlen = box.max.x - box.min.x; // 模型长度
+            let mdwid = box.max.z - box.min.z; // 模型宽度
+            let mdhei = box.max.y - box.min.y; // 模型高度
+            let x1 = box.min.x + mdlen / 2; // 模型中心点坐标X
+            let y1 = box.min.y + mdhei / 2; // 模型中心点坐标Y
+            let z1 = box.min.z + mdwid / 2; // 模型中心点坐标Z
+            model.position.set(-x1, -y1, -z1); // 将模型进行偏移
+            model.scale.set(0.015, 0.015, 0.015);
+            plane2=model;
+            group.add(plane2);
+        });
+        Loadmodel(function (model) {
+            let box = new THREE.Box3().setFromObject(model); // 获取模型的包围盒
+            let mdlen = box.max.x - box.min.x; // 模型长度
+            let mdwid = box.max.z - box.min.z; // 模型宽度
+            let mdhei = box.max.y - box.min.y; // 模型高度
+            let x1 = box.min.x + mdlen / 2; // 模型中心点坐标X
+            let y1 = box.min.y + mdhei / 2; // 模型中心点坐标Y
+            let z1 = box.min.z + mdwid / 2; // 模型中心点坐标Z
+            model.position.set(-x1, -y1, -z1); // 将模型进行偏移
+            model.scale.set(0.015, 0.015, 0.015);
+            plane3=model;
+            group.add(plane3);
+        });
+        Loadmodel(function (model) {
+            let box = new THREE.Box3().setFromObject(model); // 获取模型的包围盒
+            let mdlen = box.max.x - box.min.x; // 模型长度
+            let mdwid = box.max.z - box.min.z; // 模型宽度
+            let mdhei = box.max.y - box.min.y; // 模型高度
+            let x1 = box.min.x + mdlen / 2; // 模型中心点坐标X
+            let y1 = box.min.y + mdhei / 2; // 模型中心点坐标Y
+            let z1 = box.min.z + mdwid / 2; // 模型中心点坐标Z
+            model.position.set(-x1, -y1, -z1); // 将模型进行偏移
+            model.scale.set(0.015, 0.015, 0.015);
+            plane4=model;
+            group.add(plane4);
+        });
+        Loadmodel(function (model) {
+            let box = new THREE.Box3().setFromObject(model); // 获取模型的包围盒
+            let mdlen = box.max.x - box.min.x; // 模型长度
+            let mdwid = box.max.z - box.min.z; // 模型宽度
+            let mdhei = box.max.y - box.min.y; // 模型高度
+            let x1 = box.min.x + mdlen / 2; // 模型中心点坐标X
+            let y1 = box.min.y + mdhei / 2; // 模型中心点坐标Y
+            let z1 = box.min.z + mdwid / 2; // 模型中心点坐标Z
+            model.position.set(-x1, -y1, -z1); // 将模型进行偏移
+            model.scale.set(0.015, 0.015, 0.015);
+            plane5=model;
+            group.add(plane5);
+        });
+        Loadmodel(function (model) {
+            let box = new THREE.Box3().setFromObject(model); // 获取模型的包围盒
+            let mdlen = box.max.x - box.min.x; // 模型长度
+            let mdwid = box.max.z - box.min.z; // 模型宽度
+            let mdhei = box.max.y - box.min.y; // 模型高度
+            let x1 = box.min.x + mdlen / 2; // 模型中心点坐标X
+            let y1 = box.min.y + mdhei / 2; // 模型中心点坐标Y
+            let z1 = box.min.z + mdwid / 2; // 模型中心点坐标Z
+            model.position.set(-x1, -y1, -z1); // 将模型进行偏移
+            model.scale.set(0.015, 0.015, 0.015);
+            plane6=model;
+            group.add(plane6);
+        });
+        Loadmodel(function (model) {
+            let box = new THREE.Box3().setFromObject(model); // 获取模型的包围盒
+            let mdlen = box.max.x - box.min.x; // 模型长度
+            let mdwid = box.max.z - box.min.z; // 模型宽度
+            let mdhei = box.max.y - box.min.y; // 模型高度
+            let x1 = box.min.x + mdlen / 2; // 模型中心点坐标X
+            let y1 = box.min.y + mdhei / 2; // 模型中心点坐标Y
+            let z1 = box.min.z + mdwid / 2; // 模型中心点坐标Z
+            model.position.set(-x1, -y1, -z1); // 将模型进行偏移
+            model.scale.set(0.015, 0.015, 0.015);
+            plane7=model;
+            group.add(plane7);
+        });
+        Loadmodel(function (model) {
+            let box = new THREE.Box3().setFromObject(model); // 获取模型的包围盒
+            let mdlen = box.max.x - box.min.x; // 模型长度
+            let mdwid = box.max.z - box.min.z; // 模型宽度
+            let mdhei = box.max.y - box.min.y; // 模型高度
+            let x1 = box.min.x + mdlen / 2; // 模型中心点坐标X
+            let y1 = box.min.y + mdhei / 2; // 模型中心点坐标Y
+            let z1 = box.min.z + mdwid / 2; // 模型中心点坐标Z
+            model.position.set(-x1, -y1, -z1); // 将模型进行偏移
+            model.scale.set(0.015, 0.015, 0.015);
+            plane8=model;
+            group.add(plane8);
+        });
+        Loadmodel(function (model) {
+            let box = new THREE.Box3().setFromObject(model); // 获取模型的包围盒
+            let mdlen = box.max.x - box.min.x; // 模型长度
+            let mdwid = box.max.z - box.min.z; // 模型宽度
+            let mdhei = box.max.y - box.min.y; // 模型高度
+            let x1 = box.min.x + mdlen / 2; // 模型中心点坐标X
+            let y1 = box.min.y + mdhei / 2; // 模型中心点坐标Y
+            let z1 = box.min.z + mdwid / 2; // 模型中心点坐标Z
+            model.position.set(-x1, -y1, -z1); // 将模型进行偏移
+            model.scale.set(0.015, 0.015, 0.015);
+            plane9=model;
+            group.add(plane9);
+        });
+        Loadmodel(function (model) {
+            let box = new THREE.Box3().setFromObject(model); // 获取模型的包围盒
+            let mdlen = box.max.x - box.min.x; // 模型长度
+            let mdwid = box.max.z - box.min.z; // 模型宽度
+            let mdhei = box.max.y - box.min.y; // 模型高度
+            let x1 = box.min.x + mdlen / 2; // 模型中心点坐标X
+            let y1 = box.min.y + mdhei / 2; // 模型中心点坐标Y
+            let z1 = box.min.z + mdwid / 2; // 模型中心点坐标Z
+            model.position.set(-x1, -y1, -z1); // 将模型进行偏移
+            model.scale.set(0.015, 0.015, 0.015);
+            plane10=model;
+            group.add(plane10);
+        });
+
+    }
+    function Loadmodel(callback) {
+        // model
+        var onProgress = function (xhr) {
+            if (xhr.lengthComputable) {
+                var percentComplete = xhr.loaded / xhr.total * 100;
+                var percent = document.getElementById("percent");
+                percent.innerText = Math.round(percentComplete, 2) + '% 已经加载';
+            }
+        };
+        var onError = function (xhr) {
+        };
+        var mtlLoader = new THREE.MTLLoader();
+        mtlLoader.setPath('../Resource/models/uav/');
+        mtlLoader.load('demo6.mtl', function (materials) {
+                materials.preload();
+                var objLoader = new THREE.OBJLoader();
+                objLoader.setMaterials(materials);
+                objLoader.setPath('../Resource/models/uav/');
+                objLoader.load('demo6.obj', function (object) {
+                    console.log(object);
+                    num++;
+                    callback(object);
+                    if(num===10)
+                    {
+                        connectServer();
+                        setTimeout("init()",500);
+                    }
+                }, onProgress, onError)
+            }
+        );
+
+    }
+    function init() {
+        //直接开启帧数检测
+        //编辑代码处
+
+        var scene = new THREE.Scene();//场景构建
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);//相机构建
+        var renderer = new THREE.WebGLRenderer();//渲染器构建
+        renderer.setClearColor(0xEEEEEE);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMapEnabled = true;//激活阴影
+        //构建一个坐标轴,蓝色是x轴，红色是z轴，绿色是y轴
+        scene.add(group);
+        // add sky box
+        var path = "../Resource/textures/skybox/";//设置路径
+        var directions = ["rt", "lf", "up", "dn", "bk", "ft"];//获取对象
+        var format = ".png";//格式
+        //创建盒子，并设置盒子的大小为( 5000, 5000, 5000 )
+        var skyGeometry = new THREE.BoxGeometry(900, 900, 900);
+        //设置盒子材质
+        var materialArray = [];
+        for (var i = 0; i < 6; i++)
+            materialArray.push(new THREE.MeshBasicMaterial({
+                map: THREE.ImageUtils.loadTexture(path + directions[i] + format),//将图片纹理贴上
+                side: THREE.BackSide/*镜像翻转，如果设置镜像翻转，那么只会看到黑漆漆的一片，因为你身处在盒子的内部，所以一定要设置镜像翻转。*/
+            }));
+        var skyMaterial = new THREE.MeshFaceMaterial(materialArray);
+        var skyBox = new THREE.Mesh(skyGeometry, skyMaterial);//创建一个完整的天空盒，填入几何模型和材质的参数
+        scene.add(skyBox);//在场景中加入天空盒
+        //创建控件并绑定在相机上
+
+        var trackballControls = new THREE.TrackballControls(camera);
+        trackballControls.rotateSpeed = 1.0;
+        trackballControls.zoomSpeed = 1.0;
+        trackballControls.panSpeed = 1.0;
+        trackballControls.noZoom = false;
+        trackballControls.noPan = false;
+        trackballControls.staticMoving = true;
+        trackballControls.dynamicDampingFactor = 0.3;
+
+        var textureGrass = THREE.ImageUtils.loadTexture("../Resource/textures/general/grasslight-big.jpg");
+        textureGrass.wrapS = THREE.RepeatWrapping;
+        textureGrass.wrapT = THREE.RepeatWrapping;
+        textureGrass.repeat.set(4, 4);
+        var planeGeometry = new THREE.PlaneGeometry(500, 500);
+        //var planeMaterial = new THREE.MeshBasicMaterial({color:0xcccccc});
+        var planeMaterial = new THREE.MeshLambertMaterial({map: textureGrass});
+        var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.rotation.x = -0.5 * Math.PI;
+        plane.position.x = 0;
+        plane.position.y = 0;
+        plane.position.z = 0;
+        scene.add(plane);
+        plane.receiveShadow = true;
+
+        //添加灯光
+        var DirectionalLight = new THREE.DirectionalLight(0xffffff);
+        scene.add(DirectionalLight);
+
+        //渲染视图视角
+        camera.position.x = 100;
+        camera.position.y = 50;
+        camera.position.z = 65;
+        camera.lookAt(new THREE.Vector3(-100,0,-100));
+        var groupline = new THREE.Group();
+        var controls = new function () {
+            this.Show_track = false;
+            this.view="60";
+            this.restart = function () {
+                socket.send("restart");
+            };
+        };
+        var gui = new dat.GUI();
+
+        gui.add(controls, "view", ['90', '60', '30']).onChange(function (e) {
+            console.log(e);
+            switch (e) {
+                case "90":
+                    camera.position.x = 40;
+                    camera.position.y = 150;
+                    camera.position.z = 40;
+                    camera.lookAt(new THREE.Vector3(40,0,40));
+                    break;
+                case "60":
+                    camera.position.x = 65;
+                    camera.position.y = 200;
+                    camera.position.z = 65;
+                    camera.lookAt(new THREE.Vector3(65,0,65));
+                    break;
+                case "30":
+                    camera.position.x = 40;
+                    camera.position.y = 50;
+                    camera.position.z = 40;
+                    camera.lookAt(new THREE.Vector3(40,0,40));
+                    break;
+            }
+
+        });
+        gui.add(controls,"Show_track");
+        gui.add(controls,"restart");
+
+
+
+        var textureLoader = THREE.ImageUtils.loadTexture("../Resource/textures/general/building2.jpg");
+        //建筑物1
+        var cubeGeometry1 = new THREE.BoxGeometry(10, 50, 16);
+        var cubeMaterial1 = new THREE.MeshBasicMaterial({map: textureLoader});
+        var cube1 = new THREE.Mesh(cubeGeometry1, cubeMaterial1);
+        cube1.position.x = 30;
+        cube1.position.y = 8;
+        cube1.position.z = 40;
+        scene.add(cube1);
+        //建筑物2
+        var cubeGeometry2 = new THREE.BoxGeometry(14, 50, 2);
+        var cubeMaterial2 = new THREE.MeshBasicMaterial({map: textureLoader});
+        var cube2 = new THREE.Mesh(cubeGeometry2, cubeMaterial2);
+        cube2.position.x = 47;
+        cube2.position.y = 8;
+        cube2.position.z = 61;
+        scene.add(cube2);
+        // //建筑物3
+        var cubeGeometry3 = new THREE.BoxGeometry(2, 50, 6);
+        var cubeMaterial3 = new THREE.MeshBasicMaterial({map: textureLoader});
+        var cube3 = new THREE.Mesh(cubeGeometry3, cubeMaterial3);
+        cube3.position.x = 55;
+        cube3.position.y = 8;
+        cube3.position.z = 63;
+        scene.add(cube3);
+        // //建筑物4
+        var cubeGeometry4 = new THREE.BoxGeometry(2, 50, 12);
+        var cubeMaterial4 = new THREE.MeshBasicMaterial({map: textureLoader});
+        var cube4 = new THREE.Mesh(cubeGeometry4, cubeMaterial4);
+        cube4.position.x = 50;
+        cube4.position.y = 8;
+        cube4.position.z = 26;
+        scene.add(cube4);
+        //路线1
+        console.log(points1);
+        console.log(points2);
+        console.log(points3);
+        console.log(points4);
+        console.log(points5);
+        console.log(points6);
+        console.log(points7);
+        console.log(points8);
+        console.log(points9);
+        console.log(points10);
+        var geometry = new THREE.Geometry();
+        // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+        geometry.vertices = points1;
+        var material = new THREE.LineBasicMaterial({
+            color: 0x4488ff
+        });
+        var line = new THREE.Line(geometry, material);
+        groupline.add(line);
+        //路线2
+        var geometry2 = new THREE.Geometry();
+        // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+        geometry2.vertices = points2;
+        var material2 = new THREE.LineBasicMaterial({
+            color: 0x4488ff
+        });
+        var line2 = new THREE.Line(geometry2, material2);
+        groupline.add(line2);
+        //路线3
+        var geometry3 = new THREE.Geometry();
+        // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+        geometry3.vertices = points3;
+        var material3 = new THREE.LineBasicMaterial({
+            color: 0x4488ff
+        });
+        var line3 = new THREE.Line(geometry3, material3);
+        groupline.add(line3);
+        //路线4
+        var geometry4 = new THREE.Geometry();
+        // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+        geometry4.vertices = points4;
+        var material4 = new THREE.LineBasicMaterial({
+            color: 0x4488ff
+        });
+        var line4 = new THREE.Line(geometry4, material4);
+        groupline.add(line4);
+        //
+        //路线5
+        var geometry5 = new THREE.Geometry();
+        // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+        geometry5.vertices = points5;
+        var material5 = new THREE.LineBasicMaterial({
+            color: 0x4488ff
+        });
+        var line5 = new THREE.Line(geometry5, material5);
+        groupline.add(line5);
+        //
+        //路线6
+        var geometry6 = new THREE.Geometry();
+        // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+        geometry6.vertices = points6;
+        var material6 = new THREE.LineBasicMaterial({
+            color: 0x4488ff
+        });
+        var line6 = new THREE.Line(geometry6, material6);
+        groupline.add(line6);
+
+        //路线7
+        var geometry7 = new THREE.Geometry();
+        // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+        geometry7.vertices = points7;
+        var material7 = new THREE.LineBasicMaterial({
+            color: 0x4488ff
+        });
+        var line7 = new THREE.Line(geometry7, material7);
+        groupline.add(line7);
+
+        //路线8
+        var geometry8 = new THREE.Geometry();
+        // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+        geometry8.vertices = points8;
+        var material8 = new THREE.LineBasicMaterial({
+            color: 0x4488ff
+        });
+        var line8 = new THREE.Line(geometry8, material8);
+        groupline.add(line8);
+
+        //路线9
+        var geometry9 = new THREE.Geometry();
+        // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+        geometry9.vertices = points9;
+        var material9 = new THREE.LineBasicMaterial({
+            color: 0x4488ff
+        });
+        var line9 = new THREE.Line(geometry9, material9);
+        groupline.add(line9);
+        //路线10
+        var geometry10 = new THREE.Geometry();
+        // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+        geometry10.vertices = points10;
+        var material10 = new THREE.LineBasicMaterial({
+            color: 0x4488ff
+        });
+        var line10 = new THREE.Line(geometry10, material10);
+        groupline.add(line10);
+        function redraw()
+        {
+            var line=[];
+        }
+
+
+        var clock = new THREE.Clock();
+        var step = 0;
+        function renderScene() {
+            var delta = clock.getDelta();
+            trackballControls.update(delta);
+            plane1.position.x = points1.x;
+            plane1.position.y = points1.y;
+            plane1.position.z = points1.z;
+            plane2.position.x = points2.x;
+            plane2.position.y = points2.y;
+            plane2.position.z = points2.z;
+            plane3.position.x = points3.x;
+            plane3.position.y = points3.y;
+            plane3.position.z = points3.z;
+            plane4.position.x = points4.x;
+            plane4.position.y = points4.y;
+            plane4.position.z = points4.z;
+            plane5.position.x = points5.x;
+            plane5.position.y = points5.y;
+            plane5.position.z = points5.z;
+            plane6.position.x = points6.x;
+            plane6.position.y = points6.y;
+            plane6.position.z = points6.z;
+            plane7.position.x = points7.x;
+            plane7.position.y = points7.y;
+            plane7.position.z = points7.z;
+            plane8.position.x = points8.x;
+            plane8.position.y = points8.y;
+            plane8.position.z = points8.z;
+            plane9.position.x = points9.x;
+            plane9.position.y = points9.y;
+            plane9.position.z = points9.z;
+            plane10.position.x = points10.x;
+            plane10.position.y = points10.y;
+            plane10.position.z = points10.z;
+            isconnect();
+            requestAnimationFrame(renderScene);
+
+            if(controls.Show_track)
+                scene.add(groupline);
+            else
+                scene.remove(groupline);
+            renderer.render(scene, camera);
+        }
+        renderScene();
+
+        function onWindowResize() {
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+        }
+        function isconnect() {
+            var start;
+            var end;
+            var allChildren = connectline.children;
+            for (var j = allChildren.length - 1; j >= 0; j--) {
+                if (allChildren[j] instanceof THREE.Line) {
+                    connectline.remove(allChildren[j]);
+                }
+            }
+            console.log(connectline);
+            for(var i=0;i<10;i++)
+            {
+                for(var k=i;k<10;k++)
+                {
+                    if(tArray[i][k]===1)
+                    {
+                        switch (i) {
+                                case 0:start=points1;
+                                    break;
+                                case 1:start = points2;
+                                    break;
+                                case 2:start = points3;
+                                    break;
+                                case 3:start = points4;
+                                    break;
+                                case 4:start = points5;
+                                    break;
+                                case 5:start = points6;
+                                    break;
+                                case 6:start = points7;
+                                    break;
+                                case 7:start = points8;
+                                    break;
+                                case 8:start = points9;
+                                    break;
+                                case 9:start = points10;
+                                    break;
+                        }
+                        switch (k) {
+                            case 0:end=points1;
+                                break;
+                            case 1:end = points2;
+                                break;
+                            case 2:end = points3;
+                                break;
+                            case 3:end = points4;
+                                break;
+                            case 4:end = points5;
+                                break;
+                            case 5:end = points6;
+                                break;
+                            case 6:end = points7;
+                                break;
+                            case 7:end = points8;
+                                break;
+                            case 8:end = points9;
+                                break;
+                            case 9:end = points10;
+                                break;
+                        }
+                        drawline(start,end);
+                    }
+                }
+            }
+            scene.add(connectline);
+
+        }
+
+
+        function drawline(a,b)
+        {
+
+            var curve = new THREE.CatmullRomCurve3([
+                    //起点
+                    a,
+                    //终点
+                    b,
+                ],
+                false,
+            );
+            var connection_points = curve.getPoints(100);
+            var geometry = new THREE.Geometry();
+            // 把从曲线轨迹上获得的顶点坐标赋值给几何体
+            geometry.vertices = connection_points;
+            var material = new THREE.LineBasicMaterial({
+                color: 0x4488ff
+            });
+            var line = new THREE.Line(geometry, material);
+            connectline.add(line);
+        }
+
+        document.getElementById("WebGL-output").appendChild(renderer.domElement);
+
+
+    }
+    // load();
+    
+    
+    
+    load();
+    // connectServer();
+    // setTimeout("connectServer()",15000);
+    // setTimeout("init();",15500);
+    // document.getElementById('control-btn').onclick = function () {
+    //     Animation();
+    // };
+
+</script>
+
+</body>
+</html>

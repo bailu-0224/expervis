@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可视化</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/experMajor.css">
+    <link rel="stylesheet" href="css/switcher.css">
+    <link rel="stylesheet" href="css/window.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.switcher.min.js"></script>
+    <script src="js/echarts.min.js"></script>
+    <script src="js/ehart-full-2.min.js"></script>
+    <script src="js/ehart-full-3.min.js"></script>
+    <script type="text/javascript" src="Resource/js/three.js" ></script>
+    <script src="js/define.js"></script>
+    <script src="js/init.js"></script>
+    <script src="js/socket.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/experMajor.js"></script>
+
+    <script type="module" src="js/initanimation.js"></script>
+    <script type="text/javascript">
+        window.onload = function()
+        {
+            var loadlock = lock;
+        }
+    
+    </script>
+
+</head>
+
+<style>
+    body{
+        margin: 0;
+        overflow: hidden;
+        width: 100%;
+        height:auto;
+    } 
+    
+
+    #WebGL-output>canvas{
+        width: 600px;
+        height: 500px;
+    } 
+
+</style>
+
+
+
+<body
+    style="background: url(images/fly.jpeg) no-repeat center/100%; background-position: top center; overflow: hidden;">
+    <div class="w">
+
+        <!-- 头部 -->
+        <header class="header">
+
+            <div class="header_left"
+                style="float: left; top:30px; background: url(images/logo-mini.png) no-repeat; width: 300px; height: 50px;">
+                <ul>
+                    <li><a href="knowledge_angle.html" target="_Blank">知识角</a></li>
+                    <li class="kno_hint"> <a href="kno_hint.html" target="_Blank" style>
+                            <p>实验报告</p>
+                        </a></li>
+                </ul>
+
+
+            </div>
+
+            <div class="header_middle">
+                <ul class="tab_list">
+                    <li class="exper_intro">
+                        <a href="javascript:;">实验简介</a>
+                    </li>
+                    <li></li>
+                    <li class="exper_choose">
+                        <a href="javascript:;">无人机集群组网协同实验</a>
+                        <ul>
+                            <li><a href="experConfig.html" style="font-size: 14px;">1.1 编队变化下的组网协同</a></li>
+                            <li><a href="experConfig.html" style="font-size: 14px;">1.2 自主避障下的组网协同</a></li>
+                        </ul>
+                    </li>
+                    <li></li>
+                    <li class="exper_choose">
+                        <a href="javascript:;">无人机集群信号欺骗实验</a>
+                        <ul>
+                            <li><a href="experConfig.html" style="font-size: 14px;">2.1 编队变化下的信号欺骗</a></li>
+                            <li><a href="experConfig.html" style="font-size: 14px;">2.2 自主避障下的信号欺骗</a></li>
+                        </ul>
+                    </li>
+                    <li></li>
+                    <li class="exper_choose">
+                        <a href="javascript:;">无人机集群网络攻击实验</a>
+                        <ul>
+                            <li><a href="experConfig.html" style="font-size: 14px;">3.1 编队变化下的网络攻击</a></li>
+                            <li><a href="experConfig.html" style="font-size: 14px;">3.2 自主避障下的网络攻击</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="header_right" style="left: 980px;">
+                <ul>
+                    <li class="start" stylep="width: 75px; margin:10px 3px">
+                        <p>重新仿真</p>
+                    </li>
+                    <li class="suspend" style="width: 50px; margin:10px 3px">
+                        <p>暂停</p>
+                    </li>
+                    <li class=" exit" style="width: 75px; margin:10px -3px">
+                        <span>退出</span>
+                    </li>
+                </ul>
+            </div>
+        </header>
+        <!-- 主体 -->
+        <div class=" major">
+            <p></p>
+            <!-- <div class="navi"></div> -->
+            <div class="major_left">
+                <h3>实验步骤</h3>
+                <ul class="exper_guide">
+                    <li class="current">
+                        <p class="exper_guide_title">第一步(初始配置)</p>
+                        <p class="exper_guide_content"></p>
+                    </li>
+                    <li>
+                        <p class="exper_guide_title">第二步(配置二)</p>
+                        <p class="exper_guide_content"></p>
+                    </li>
+                    <li>
+                        <p class="exper_guide_title">第三步(配置三)</p>
+                        <p class="exper_guide_content"></p>
+                    </li>
+                    <li>
+                        <p class="exper_guide_title">第四步(配置三)</p>
+                        <p class="exper_guide_content"></p>
+                    </li>
+                    <li>
+                        <p class="exper_guide_title">第五步(配置四)</p>
+                        <p class="exper_guide_content"></p>
+                    </li>
+                </ul>
+
+                <!-- 选择个体数据展示 -->
+                <div class="switch_panel">
+                    <p style="float: left; ">无人机:</p>
+                    <select class="chooseFly">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                    </select>
+                    <input class="switch_button" type="checkbox" value="option">
+                    <!-- 个体数据展示 -->
+                    <div id="unit" class="unit">
+                        <div id="unit_1" class="chart_div" style="width: 210px; height: 100px; ">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <td>目的无人机</td>
+                                        <td>跳数</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>0</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>6</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>7</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <!-- <tr>
+                                        <td>8</td>
+                                        <td>0</td>
+                                    </tr> -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="unit_2" class="chart_div" style=" width: 210px; height: 120px; ">
+                        </div>
+                        <div id="unit_3" class="chart_div" style=" width: 210px; height: 140px; position: relative;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- flocking数据展示 -->
+                <div id="flockChart_1" class="chart_div" style="width: 210px; height: 120px;">
+                </div>
+                <div id="flockChart_2" class="chart_div" style="width: 210px; height: 120px;">
+                </div>
+                <div id="flockChart_3" class="chart_div switch_chart_bg" style="width: 210px; height: 120px;">
+                </div>
+            </div>
+            <div class="major_middle" id="major_middle" style="width: 600px; height: 90%;">
+                <!-- <div id="percent"></div> -->
+                <div id="WebGL-output" style="width: 600px; height: 500px;">
+                    <div style="z-index: 1;position: absolute" class="option" id = "lock">
+                    <input type="image" src="images/exper_lock.png"  alt="stop/start" width="30" height="30" id="lock_camera"/>
+                    </div>
+                </div>
+                </div>
+                <!-- <img src="images/gazebo.png" alt="" style="width: 90%;height: 90%; margin: 30px 30px;"> -->
+
+            
+            <div class="major_right">
+                <div id="ripple" class="chart_div" style="width: 210px; height: 140px;">
+                    <div id="ripple_1" class="chart_div"
+                        style="float: left; width: 105px; height: 140px; margin: 0px;border-radius: 20px 0px 0px 20px;">
+                    </div>
+                    <div id="ripple_2" class="chart_div"
+                        style="float: left; width: 105px; height: 140px; margin: 0px;border-radius: 0px 20px 20px 0px;">
+                    </div>
+                </div>
+                <div id="bar" class="chart_div" style=" width: 210px; height: 140px;">
+                </div>
+                <div id="line" class="chart_div" style=" width: 210px; height: 140px;">
+                </div>
+            </div>
+        </div>
+
+        <!-- 尾部 -->
+        <footer class="footer">
+            <div>
+                <ul>
+                    <li class="contro">协同控制模型配置</li>
+                    <li class="net">集群组网配置</li>
+                    <li class="gps">GPS欺骗配置</li>
+                    <li class="attacck">网络攻击配置</li>
+                </ul>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 知识提示窗口，与帮助窗口 -->
+    <div class="kno_window">
+        <div id="kno_title" class="kno_title">
+            <p>知识提示</p>
+        </div>
+        <div class="kno_content">
+            <p class="kno_content_detail">
+                实验
+            </p>
+        </div>
+    </div>
+
+    <!-- 场景配置模板 -->
+    <div class="scene_config">
+        <img src="images/circleFly.png" alt=""
+            style="width: 100% ;height: 100%;position: absolute; opacity: 0.3;z-index: -1;">
+        <div class="scene_config_title">
+            <p>场景配置</p>
+            <span><a href="javascript:void(0);" class="scene_config_close_login">关闭</a>
+            </span>
+        </div>
+        <div class="scene_config_content">
+            <ul class="scene_content_choose">
+                <li>场景一</li>
+                <li>场景二(预留)</li>
+            </ul>
+            <ul class="scene_content_show">
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+        </div>
+        <div class="scene_config_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+    <!-- 控制协同模型配置 -->
+    <div class="contro_config">
+        <img src="images/oneFly.png" alt=""
+            style="width: 100% ;height: 100%;position: absolute; opacity: 0.3;z-index: -1;">
+        <div class="contro_config_title">
+            <p>控制协同模型配置</p>
+            <span><a href="javascript:void(0);" class="contro_config_close_login">关闭</a>
+            </span>
+        </div>
+        <div class="contro_config_content">
+            <p style="float:left; ">平衡距离(m):</p>
+            <p style="float: left;"></p>
+
+            <p style="float: left;">最大感知距离(m):</p>
+            <p style="float: left;"></p>
+
+            <p style="float: left;margin-left: 42px; margin-top: 30px ">排斥强度:</p>
+            <p style="float: left;"></p>
+
+            <p style="float: left; margin-left: 75px; margin-top: 30px;">对齐强度:</p>
+            <p style="float: left;"></p>
+
+            <p style="float: left; margin-left: 42px; margin-top: 30px">集中强度:</p>
+            <p style="float: left;"></p>
+
+            <p style="float: left; margin-left: 75px; margin-top: 30px;">目标强度:</p>
+            <p style="float: left;"></p>
+        </div>
+        <div class="contro_config_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+    <!-- 组网配置 -->
+    <div class="net_config">
+        <img src="images/network.png" alt=""
+            style="width: 100% ;height: 100%;position: absolute; opacity: 0.3;z-index: -1;">
+        <div class="net_config_title">
+            <p>集群组网配置</p>
+            <span><a href="javascript:void(0);" class="net_config_close_login">关闭</a>
+            </span>
+        </div>
+        <div class="net_config_content">
+
+            <p style="float: left; ">通信间隔(m):</p>
+            <p style="float:left; "></p>
+
+            <p style="float: left; margin-left: 50px">通信距离(s):</p>
+            <p style="float:left; "></p>
+
+            <p style="float:left;  margin-left: 38px">路由协议:</p>
+            <p style="float:left; "></p>
+
+            <p style="float:left; float:left; margin-left: 15px">传输速率(Mbps):</p>
+            <p style="float: left;"></p>
+
+        </div>
+        <div class="net_config_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+
+    <!-- GPS欺骗配置 -->
+    <div class="gps_config">
+        <img src="images/network.png" alt=""
+            style="width: 100% ;height: 100%;position: absolute; opacity: 0.3;z-index: -1;">
+        <div class="gps_config_title">
+            <p>GPS欺骗配置</p>
+            <span><a href="javascript:void(0);" class="gps_config_close_login">关闭</a>
+            </span>
+        </div>
+        <div class="gps_config_content">
+
+            <p style="float:left; ">路由协议:</p>
+            <p style="float: left;"></p>
+
+            <p style="float: left;">通信距离:</p>
+            <p style="float: left;"></p>
+
+            <p style="float: left;">欺骗数量:</p>
+            <p style="float: left;"></p>
+
+            <p style="float: left; ">欺骗节点:</p>
+            <p style="float: left;"></p>
+
+            <p style="float: left; ">欺骗均值:</p>
+            <p style="float: left;"></p>
+
+            <p style="float: left; ">欺骗方差:</p>
+            <p style="float: left;"></p>
+
+
+        </div>
+        <div class="gps_config_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+
+    <!-- 网络攻击配置 -->
+    <div class="attack_config">
+        <img src="images/network.png" alt=""
+            style="width: 100% ;height: 100%;position: absolute; opacity: 0.3;z-index: -1;">
+        <div class="attack_config_title">
+            <p>网络攻击配置</p>
+            <span><a href="javascript:void(0);" class="attack_config_close_login">关闭</a>
+            </span>
+        </div>
+        <div class="attack_config_content">
+
+            <p style="float:left; ">路由协议:</p>
+            <p style="float: left;"></p>
+
+            <p style="float: left;">通信距离:</p>
+            <p style="float: left;"></p>
+
+            <p style="float: left;">攻击方式:</p>
+            <p style="float: left;"></p>
+
+            <p style="float: left;">攻击节点:</p>
+            <p style="float: left;"></p>
+
+            <p style="float: left; margin-left: 65px;">丢弃率:</p>
+            <p style="float: left;"></p>
+        </div>
+        <div class="attack_config_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+    <!-- 实验简介 -->
+    <div class="intro_window popup_window" style="background: url(./images/bg-05.png) no-repeat center/101%;">
+        <p></p>
+        <div class=" intro_content popup_window_content">
+            <p></p>
+        </div>
+        <div class="intro_button popup_window_login_button">
+            <a href="javascript:void(0);">确认</a>
+        </div>
+    </div>
+
+    <!-- 选择实验窗口 -->
+    <div class="choose_window popup_window" style="display:none;">
+        <p></p>
+        <div class="choose_content popup_window_content">
+            <p></p>
+        </div>
+        <div class="choose_button popup_window_login_button"><a href="javascript:void(0);">确认</a></div>
+    </div>
+
+    <!-- 提示退出按钮 -->
+    <div class="exit_window">
+        <div class="exit_content ">
+            当前实验配置展示已结束,请点击右上角退出按钮，并按照实验步骤进行后续实验
+        </div>
+        <div class="exit_button"><a href="javascript:void(0);">关闭</a></div>
+    </div>
+
+
+
+</body>
+
+<script>
+
+        console.log("设置");
+        
+       
+</script> 
+
+</html>
