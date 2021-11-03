@@ -5,6 +5,10 @@
     import { OrbitControls } from './jsm/controls/OrbitControls.js';
     import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
     import {DRACOLoader} from "./jsm/loaders/DRACOLoader.js";
+    import { Line2 } from './jsm/lines/Line2.js';
+	import { LineMaterial } from './jsm/lines/LineMaterial.js';
+	import { LineGeometry } from './jsm/lines/LineGeometry.js';
+    import * as GeometryUtils from './jsm/utils/GeometryUtils.js';
     import { KTX2Loader } from './jsm/loaders/KTX2Loader.js';
     import { MeshoptDecoder } from './jsm/libs/meshopt_decoder.module.js';
 
@@ -16,7 +20,7 @@
    
     var Viewcontrols;
     Viewcontrols = new function () {
-        this.lock_perspective = false;
+        this.lock_perspective = true;
     }
     const dracoLoader  =new DRACOLoader();
     var controls;
@@ -155,7 +159,7 @@
     }
     function isconnect() {
         var start=new THREE.Vector3(0,0,0);
-        var end=new THREE.Vector3(0,0,0);
+        var end=new THREE.Vector3(1,0,0);
         var allChildren = connectline.children;
         for (var j = allChildren.length - 1; j >= 0; j--) {
             if (allChildren[j] instanceof THREE.Line) {
@@ -329,4 +333,23 @@
             else
                 Viewcontrols.lock_perspective = false;
         })
+        $("#flyechart").show();
+        $("#WebGL-output").hide();
+        choosemode = 1;
+        $("#switch_case").click(function()
+        {
+          if(choosemode==0)
+            {
+             $("#flyechart").show();
+             $("#WebGL-output").hide();
+             choosemode=1;
+             }
+            else
+            {
+            $("#flyechart").hide();
+            $("#WebGL-output").show();
+            choosemode=0;   
+             }
+        })  
+
     

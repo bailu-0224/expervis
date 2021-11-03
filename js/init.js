@@ -4,38 +4,8 @@ var chooseFly = 0;
 var comDistance = 0;
 
 var indexindex = 1;
+var choosemode = 0;
 
-
-
-
-
-// var plane1;
-// var plane2;
-// var plane3;
-// var plane4;
-// var plane5;
-// var plane6;
-// var plane7;
-// var plane8;
-// var plane9;
-// var plane10;
-// var planeAttack=new Array(4);
-// var c=0;
-// var socket;
-// var points1 = new THREE.Vector3(1,20,1);
-// var points2 = new THREE.Vector3(1,20,1);
-// var points3= new THREE.Vector3(1,20,1);
-// var points4= new THREE.Vector3(1,20,1);
-// var points5= new THREE.Vector3(1,20,1);
-// var points6= new THREE.Vector3(1,20,1);
-// var points7= new THREE.Vector3(1,20,1);
-// var points8= new THREE.Vector3(1,20,1);
-// var points9= new THREE.Vector3(1,20,1);
-// var points10= new THREE.Vector3(1,20,1);
-// var num=0;
-// var Attacknum=0;
-// var id;
-// var scene = new THREE.Scene();//场景构建
 var points = [];
 for(let i=0;i<10;i++)
     points[i]=new THREE.Vector3(0,50,20+i*10);
@@ -45,17 +15,12 @@ for(var k=0;k<flyIndictor;k++)
 for(var i=0;i<flyIndictor;i++)
     for(var k=0;k<flyIndictor;k++)
         tArray[i][k]=0;
-// var connectline = new THREE.Group();
 
 
 
 //初始化图表
 function initChart() {
-
-    // load(); 
-
-
-    // flyChart = echarts.init(document.getElementById('major_middle'));
+    flyChart = echarts.init(document.getElementById('flyechart'));
     flockChart_1 = echarts.init(document.getElementById('flockChart_1'));
     flockChart_2 = echarts.init(document.getElementById('flockChart_2'));
     flockChart_3 = echarts.init(document.getElementById('flockChart_3'));
@@ -225,8 +190,8 @@ function initChart() {
         },
         xAxis: {
             type: 'value',
-            max: showBorder[experFlag],
-            // max: 80,
+            // max: showBorder[experFlag],
+            max: 80,
             splitNumber: 10,
             axisLine: {
                 lineStyle: {
@@ -244,8 +209,8 @@ function initChart() {
         },
         yAxis: {
             type: 'value',
-            max: showBorder[experFlag],
-            // max: 80,
+            // max: showBorder[experFlag],
+            max: 80,
             splitNumber: 10,
             axisLine: {
                 lineStyle: {
@@ -302,7 +267,7 @@ function initChart() {
             },
         ]
     };
-    // flyChart.setOption(flyOption);
+    flyChart.setOption(flyOption);
 
     //个体双向bar图初始化
     var legendData = ['发包数', '收包数']; //图列
@@ -944,7 +909,7 @@ function setOptions(name, x, y, target, isAttack, netLostPackage, totalLostPacka
     fly3dStep(name, x, y,target,isAttack,isCollision);
 
     //飞机图
-    // flyStep(name, x, y, target, isAttack, isCollision);
+    flyStep(name, x, y, target, isAttack, isCollision);
 
     //双向bar图
     doubleBarStep(send, recv);
