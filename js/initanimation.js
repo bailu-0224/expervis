@@ -15,18 +15,23 @@
     let camera, scene, renderer;
     let mixer =[];
     var plane = [];
+    var vertices = [];
+    const geometry = new THREE.BufferGeometry();
     for(let i=0;i<10;i++)
     plane[i] = new THREE.Mesh(new THREE.BoxGeometry(0, 0, 0));
    
     var Viewcontrols;
     Viewcontrols = new function () {
         this.lock_perspective = true;
+        this.look_down = false;
     }
     const dracoLoader  =new DRACOLoader();
     var controls;
     const clock = new THREE.Clock();
     const connectline = new THREE.Group();
     const container = document.getElementById( "WebGL-output" );
+    const textureLoader = new THREE.TextureLoader();
+    const texture = textureLoader.load( './images/sendmessage1.png' );
     const stats = new Stats();
     container.appendChild( stats.dom );
     init3D();
@@ -71,7 +76,6 @@
         loader.load( 'scenedraco.glb', function ( gltf ) {
             scene.add( gltf.scene );
             console.log(gltf.scene);
-            render();
         } );
         const axes = new THREE.AxesHelper(1000);
         // scene.add(axes);
@@ -79,9 +83,8 @@
 
         loader.load('redplanedraco.glb',function (gltf) {
             plane[0] = gltf.scene;
-            console.log(gltf.scene);
             plane[0].scale.set(30,30,30);
-            for(let i=1;i<10;i++)
+            for(let i=1;i<flyIndictor;i++)
             {
                 
                 plane[i] = plane[0].clone();
@@ -94,11 +97,14 @@
             }
             animate();
             scene.add(plane[0]);
-            render();
         })
-
-
-        console.log(scene);
+        loader.load('13.glb',function(gltf)
+        {
+            scene.add(gltf.scene);
+            gltf.scene.position.set( 50, 50, 100 );
+            mixer[10] = new THREE.AnimationMixer(gltf.scene);
+            mixer[10].clipAction(gltf.animations[0]).play();
+        })
         controls = new OrbitControls( camera, renderer.domElement );
         controls.addEventListener( 'change', render ); // use if there is no animation loop
         // controls.minDistance = 400;
@@ -107,7 +113,7 @@
         controls.update();
         window.addEventListener( 'resize', onWindowResize );
         console.log(tArray);
-       
+       createpoints();
 
     }
 
@@ -140,13 +146,19 @@
         if(Viewcontrols.lock_perspective)
         {
             controls.enabled = false;
-            camera.position.set(points[5].x+100,points[5].y+100,points[5].z+100)
+            camera.position.set(points[5].x+200,points[5].y+100,points[5].z)
             camera.lookAt(points[5]);
+            if(Viewcontrols.look_down)
+                {
+                    camera.position.set(points[5].x+20,points[5].y+100,points[5].z+20)
+                    camera.lookAt(points[5]);
+                }
         }
         else
         {
             controls.enabled = true;
         }
+        
         
 
     }
@@ -154,7 +166,7 @@
         requestAnimationFrame( animate );
         const delta = clock.getDelta();
         stats.update();
-        for(let i=0;i<10;i++)
+        for(let i=0;i<11;i++)
             mixer[i].update( delta );
     }
     function isconnect() {
@@ -183,6 +195,7 @@
     }
     function drawline(a,b)
     {
+        vertices.push(a.x,a.y,a.z,b.x,b.y,b.z);
         const linepoints =[];
         linepoints.push(a);
         linepoints.push(b);
@@ -324,6 +337,15 @@
         }
 
     }
+    function  createpoints()
+    {
+        
+        geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+      
+        const materials = new THREE.PointsMaterial( { size: 10, map: texture, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
+        const particles = new THREE.Points( geometry, materials );
+        scene.add(particles);
+    }
     
         $("#lock_camera").click(function()
         {
@@ -351,5 +373,13 @@
             choosemode=0;   
              }
         })  
+        $("#switch_eyesight").click(function()
+        {
+            if(Viewcontrols.look_down===false)
+                Viewcontrols.look_down = true;
+            else
+                Viewcontrols.look_down = false;
+        }
+        )
 
     
