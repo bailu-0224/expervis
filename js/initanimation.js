@@ -5,18 +5,32 @@
     import { OrbitControls } from './jsm/controls/OrbitControls.js';
     import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
     import {DRACOLoader} from "./jsm/loaders/DRACOLoader.js";
+
+    import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+    import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+    import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+    import { OutlinePass } from './jsm/postprocessing/OutlinePass.js';
+    import { FXAAShader } from './jsm/shaders/FXAAShader.js';
+
     import { Line2 } from './jsm/lines/Line2.js';
 	import { LineMaterial } from './jsm/lines/LineMaterial.js';
 	import { LineGeometry } from './jsm/lines/LineGeometry.js';
     import * as GeometryUtils from './jsm/utils/GeometryUtils.js';
     import { KTX2Loader } from './jsm/loaders/KTX2Loader.js';
     import { MeshoptDecoder } from './jsm/libs/meshopt_decoder.module.js';
-
-    let camera, scene, renderer;
+    import {Sky} from './jsm/objects/Sky.js';
+    let camera, scene, renderer,outlinePass,composer,sky,sun;
+    var renderEnabled = true;
+    let timeOut = null;
     let mixer =[];
     var plane = [];
     var vertices = [];
-    const geometry = new THREE.BufferGeometry();
+    let line,matLine;
+
+    const fatlinepoints = [];
+    const falinepoistions = [];
+    const colors = [];
+    let selectedObjects=[];
     for(let i=0;i<10;i++)
     plane[i] = new THREE.Mesh(new THREE.BoxGeometry(0, 0, 0));
    
@@ -31,16 +45,22 @@
     const connectline = new THREE.Group();
     const container = document.getElementById( "WebGL-output" );
     const textureLoader = new THREE.TextureLoader();
-    const texture = textureLoader.load( './images/sendmessage1.png' );
+    const texture = textureLoader.load( './images/sendMessage2.jpeg' );
+    var pillarmaterial = new THREE.MeshPhongMaterial( {
+        color: 0x156289,
+        emissive: 0x00FFFF,
+        side: THREE.DoubleSide,
+        shading: THREE.FlatShading,
+        vertexColors:THREE.FaceColors
+    } );
+    const materials = new THREE.SpriteMaterial( { map: texture} );
+    const geometry1 = new THREE.BufferGeometry();
+    const pointsAll  = new THREE.Group();
     const stats = new Stats();
     container.appendChild( stats.dom );
     init3D();
     render();
-
-
     function init3D() {
-
-
         renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
@@ -50,8 +70,6 @@
         container.appendChild( renderer.domElement );
         camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
         camera.position.set( 100, 100, 150 );
-
-
         const environment = new RoomEnvironment();
         const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
@@ -75,7 +93,6 @@
         loader.setDRACOLoader(dracoLoader);
         loader.load( 'scenedraco.glb', function ( gltf ) {
             scene.add( gltf.scene );
-            console.log(gltf.scene);
         } );
         const axes = new THREE.AxesHelper(1000);
         // scene.add(axes);
@@ -86,7 +103,6 @@
             plane[0].scale.set(30,30,30);
             for(let i=1;i<flyIndictor;i++)
             {
-                
                 plane[i] = plane[0].clone();
                 scene.add(plane[i]);
             }
@@ -106,14 +122,74 @@
             mixer[10].clipAction(gltf.animations[0]).play();
         })
         controls = new OrbitControls( camera, renderer.domElement );
-        controls.addEventListener( 'change', render ); // use if there is no animation loop
+        controls.addEventListener( 'change', function() 
+        {
+            timeRender();
+        } 
+        ); // use if there is no animation loop
         // controls.minDistance = 400;
         // controls.maxDistance = 1000;
         controls.target.set( 10, 90, - 16 );
         controls.update();
         window.addEventListener( 'resize', onWindowResize );
         console.log(tArray);
-       createpoints();
+        // falinepoistions.length=0;
+        // fatlinepoints.length=0;
+        // fatlinepoints.push(new THREE.Vector3(0,0,0));
+        // fatlinepoints.push(new THREE.Vector3(1,1,1));
+        // const spline = new THREE.CatmullRomCurve3(fatlinepoints);
+        // const divisions = Math.round(12*fatlinepoints.length);
+        // const point = new THREE.Vector3();
+        // const color = new THREE.Color();
+        // for( let i=0,l=divisions;i<l;i++)
+        // {
+        //     const t=i/l;
+        //     spline.getPoint(t,point);
+        //     falinepoistions.push(point.x,point.y,point.z);
+        //     color.setHSL( t, 1.0, 0.5 );
+		// 	colors.push( color.r, color.g, color.b );
+        // }
+        // const geometry = new LineGeometry();
+		//       geometry.setPositions( falinepoistions );
+		// 		matLine = new LineMaterial( {
+
+		// 			color: 0x000000,
+		// 			linewidth: 5, // in world units with size attenuation, pixels otherwise
+		// 			vertexColors: true,
+					
+		// 			//resolution:  // to be set by renderer, eventually
+		// 			dashed: false,
+		// 			alphaToCoverage: true,
+
+		// 		} );
+
+		// 		line = new Line2( geometry, matLine );
+		// 		line.scale.set( 1, 1, 1 );
+        //         console.log(line)
+        // scene.add(line)
+        sky = new Sky();
+		sky.scale.setScalar( 45000 );
+		scene.add( sky );
+        sun = new THREE.Vector3();
+        const effectController = {
+            turbidity: 10,
+            rayleigh: 3,
+            mieCoefficient: 0.005,
+            mieDirectionalG: 0.7,
+            elevation: 2,
+            azimuth: 180,
+            exposure: renderer.toneMappingExposure
+        };
+                    const uniforms = sky.material.uniforms;
+					uniforms[ 'turbidity' ].value = effectController.turbidity;
+					uniforms[ 'rayleigh' ].value = effectController.rayleigh;
+					uniforms[ 'mieCoefficient' ].value = effectController.mieCoefficient;
+					uniforms[ 'mieDirectionalG' ].value = effectController.mieDirectionalG;
+                    const phi = THREE.MathUtils.degToRad( 90 - effectController.elevation );
+					const theta = THREE.MathUtils.degToRad( effectController.azimuth );
+					sun.setFromSphericalCoords( 1, phi, theta );
+                    uniforms[ 'sunPosition' ].value.copy( sun );
+					renderer.toneMappingExposure = effectController.exposure;
 
     }
 
@@ -128,21 +204,8 @@
 
     }
 
-    //
-
-    function render() {
-        for(let i=0;i<10;i++)
-        {
-            plane[i].position.x=points[i].x;
-            plane[i].position.y=points[i].y;
-            plane[i].position.z=points[i].z;
-        }
-        
-        renderer.render( scene, camera );
-        $("#WebGL-output>canvas").css("width","600px");
-        $("#WebGL-output>canvas").css("height","450px");
-        requestAnimationFrame(render);
-        isconnect();
+    function Controlcase()
+    {
         if(Viewcontrols.lock_perspective)
         {
             controls.enabled = false;
@@ -158,26 +221,72 @@
         {
             controls.enabled = true;
         }
-        
-        
 
     }
+    function update_data()
+    {
+        for(let i=0;i<10;i++)
+        {
+            plane[i].position.x=points[i].x;
+            plane[i].position.y=points[i].y;
+            plane[i].position.z=points[i].z;
+        }
+        isconnect();
+        renderEnabled = true;
+    }
+    setInterval(update_data,80);
+    function render() {
+        Controlcase();
+        brighten();
+        
+        if(renderEnabled)
+        {
+            renderEnabled = false;
+            renderer.render( scene, camera );
+        }
+        $("#WebGL-output>canvas").css("width","600px");
+        $("#WebGL-output>canvas").css("height","450px");
+        requestAnimationFrame(render);  
+    }
+    //调用一次可以渲染80ms
+    function timeRender() {
+	//设置为可渲染状态
+    renderEnabled = true;
+    //清除上次的延迟器
+    if (timeOut) {
+        clearTimeout(timeOut);
+    }
+    timeOut = setTimeout(function () {
+        renderEnabled = false;
+    }, 3000);
+    }
+ 
     function animate() {
         requestAnimationFrame( animate );
         const delta = clock.getDelta();
         stats.update();
         for(let i=0;i<11;i++)
             mixer[i].update( delta );
+        //  composer.render();    
+       
     }
     function isconnect() {
         var start=new THREE.Vector3(0,0,0);
         var end=new THREE.Vector3(1,0,0);
+        // scene.remove(connectline);
+      
         var allChildren = connectline.children;
         for (var j = allChildren.length - 1; j >= 0; j--) {
-            if (allChildren[j] instanceof THREE.Line) {
+            if (allChildren[j] instanceof Line2) {
                 connectline.remove(allChildren[j]);
             }
         }
+        // var allPointsChildren = pointsAll.children;
+        // for (var j = allPointsChildren.length - 1; j >= 0; j--) {
+        //     if (allPointsChildren[j] instanceof THREE.Sprite) {
+        //         pointsAll.remove(allPointsChildren[j]);
+        //     }
+        // }
         for(var i=0;i<flyIndictor;i++)
         {
             for(var k=i;k<flyIndictor;k++)
@@ -191,18 +300,47 @@
             drawline(start,end);
         }
         scene.add(connectline);
-
+        scene.add(pointsAll);
     }
     function drawline(a,b)
     {
-        vertices.push(a.x,a.y,a.z,b.x,b.y,b.z);
-        const linepoints =[];
-        linepoints.push(a);
-        linepoints.push(b);
-        const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
-        const geometry = new THREE.BufferGeometry().setFromPoints( linepoints );
-        const line = new THREE.Line( geometry, material );
-        connectline.add(line);
+        // var pointsX = (a.x-b.x)/2;
+        // var pointsZ = (a.z-b.z)/2;
+        // var length = Math.sqrt(((a.x-b.x)*(a.x-b.x))+((a.z-b.z)*(a.z-b.z)));
+        // console.log(length);
+        // vertices.push((a.x+b.x)/2,(a.y+b.y)/2,a.z);
+
+        // geometry1.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+        // const particles = new THREE.Points( geometry1, materials );
+        // pointsAll.add(particles);
+        // var spirte = new THREE.Sprite(materials);
+        // spirte.position.set((a.x+b.x)/2,(a.y+b.y)/2,a.z);
+        // spirte.scale.set(4,4,4);
+        // pointsAll.add(spirte);
+        // const linepoints =[];
+        // linepoints.push(a);
+        // linepoints.push(b);
+        // const material = new THREE.LineBasicMaterial( { color: 0x0000ff , linewidth: 2} );
+        // const geometry = new THREE.BufferGeometry().setFromPoints( linepoints );
+        // const line = new THREE.Line( geometry, material );
+        // connectline.add(line);
+        // const cylinder = new THREE.Mesh( new THREE.CylinderBufferGeometry(0.5,0.5,length), pillarmaterial );
+        // cylinder.position.set( pointsX,50,pointsZ);//两实体的中点，也就是柱子线的中点，自己理解
+        // console.log(cylinder.position);
+        
+        // cylinder.rotation.x -= Math.PI * 0.5;
+        let geometry2 = new LineGeometry();
+        var pointArr = [a.x,a.y,a.z,b.x,b.y,b.z];
+        geometry2.setPositions(pointArr);
+ 
+        let material2 = new LineMaterial({
+        linewidth: 5,
+        color: 0x156289,
+        });
+        material2.resolution.set(window.innerWidth+100,window.innerHeight+100);//这句如果不加宽度仍然无效
+        let line2 = new Line2(geometry2, material2);
+        connectline.add(line2);
+        
     }
     function initbuilding() {
         var textureLoader = THREE.ImageUtils.loadTexture("../Resource/textures/general/building2.jpg");
@@ -337,14 +475,39 @@
         }
 
     }
-    function  createpoints()
+    function brighten()
     {
-        
-        geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-      
-        const materials = new THREE.PointsMaterial( { size: 10, map: texture, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
-        const particles = new THREE.Points( geometry, materials );
-        scene.add(particles);
+                 composer = new EffectComposer( renderer );
+
+                var renderPass = new RenderPass( scene, camera );
+                composer.addPass( renderPass );
+
+                outlinePass = new OutlinePass( new THREE.Vector2( window.innerWidth, window.innerHeight ), scene, camera );
+                composer.addPass( outlinePass );
+
+                var onLoad = function ( texture ) {
+
+                    outlinePass.patternTexture = texture;
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+
+                };
+
+                var ttloader = new THREE.TextureLoader();
+
+                ttloader.load( './images/tri_pattern.jpg', onLoad );
+
+                var effectFXAA = new ShaderPass( FXAAShader );
+                effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+                effectFXAA.renderToScreen = true;
+                composer.addPass( effectFXAA );
+                outlinePass.selectedObjects =selectedObjects;
+
+    }
+    function addSelectedObject( object ) {
+        selectedObjects = [];
+        selectedObjects.push( object );
+
     }
     
         $("#lock_camera").click(function()
