@@ -6,31 +6,16 @@
     import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
     import {DRACOLoader} from "./jsm/loaders/DRACOLoader.js";
 
-    import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-    import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-    import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-    import { OutlinePass } from './jsm/postprocessing/OutlinePass.js';
-    import { FXAAShader } from './jsm/shaders/FXAAShader.js';
-
     import { Line2 } from './jsm/lines/Line2.js';
 	import { LineMaterial } from './jsm/lines/LineMaterial.js';
 	import { LineGeometry } from './jsm/lines/LineGeometry.js';
-    import * as GeometryUtils from './jsm/utils/GeometryUtils.js';
-    import { KTX2Loader } from './jsm/loaders/KTX2Loader.js';
-    import { MeshoptDecoder } from './jsm/libs/meshopt_decoder.module.js';
     import {Sky} from './jsm/objects/Sky.js';
     let camera, scene, renderer,outlinePass,composer,sky,sun;
     var renderEnabled = true;
     let timeOut = null;
     let mixer =[];
     var plane = [];
-    var vertices = [];
-    let line,matLine;
-
-    const fatlinepoints = [];
-    const falinepoistions = [];
-    const colors = [];
-    let selectedObjects=[];
+    const planepoints =[];
     for(let i=0;i<10;i++)
     plane[i] = new THREE.Mesh(new THREE.BoxGeometry(0, 0, 0));
    
@@ -44,17 +29,6 @@
     const clock = new THREE.Clock();
     const connectline = new THREE.Group();
     const container = document.getElementById( "WebGL-output" );
-    const textureLoader = new THREE.TextureLoader();
-    const texture = textureLoader.load( './images/sendMessage2.jpeg' );
-    var pillarmaterial = new THREE.MeshPhongMaterial( {
-        color: 0x156289,
-        emissive: 0x00FFFF,
-        side: THREE.DoubleSide,
-        shading: THREE.FlatShading,
-        vertexColors:THREE.FaceColors
-    } );
-    const materials = new THREE.SpriteMaterial( { map: texture} );
-    const geometry1 = new THREE.BufferGeometry();
     const pointsAll  = new THREE.Group();
     const stats = new Stats();
     container.appendChild( stats.dom );
@@ -86,9 +60,6 @@
         dracoLoader.setDecoderConfig({type:'js'});
         dracoLoader.preload();
         
-        // const ktx2Loader = new KTX2Loader()
-        //     .setTranscoderPath( 'jss/libs/basis/' )
-        //     .detectSupport( renderer );
         const loader = new GLTFLoader().setPath('models/gltf/' );
         loader.setDRACOLoader(dracoLoader);
         loader.load( 'scenedraco.glb', function ( gltf ) {
@@ -116,8 +87,13 @@
         })
         loader.load('13.glb',function(gltf)
         {
+            const nextmodel = gltf.scene.clone();
+            nextmodel.position.set(75,40,75);
+            scene.add(nextmodel);
             scene.add(gltf.scene);
-            gltf.scene.position.set( 50, 50, 100 );
+            gltf.scene.position.set( 25, 40, 125 );
+            mixer[11] = new THREE.AnimationMixer(nextmodel);
+            mixer[11].clipAction(gltf.animations[0]).play();
             mixer[10] = new THREE.AnimationMixer(gltf.scene);
             mixer[10].clipAction(gltf.animations[0]).play();
         })
@@ -133,40 +109,6 @@
         controls.update();
         window.addEventListener( 'resize', onWindowResize );
         console.log(tArray);
-        // falinepoistions.length=0;
-        // fatlinepoints.length=0;
-        // fatlinepoints.push(new THREE.Vector3(0,0,0));
-        // fatlinepoints.push(new THREE.Vector3(1,1,1));
-        // const spline = new THREE.CatmullRomCurve3(fatlinepoints);
-        // const divisions = Math.round(12*fatlinepoints.length);
-        // const point = new THREE.Vector3();
-        // const color = new THREE.Color();
-        // for( let i=0,l=divisions;i<l;i++)
-        // {
-        //     const t=i/l;
-        //     spline.getPoint(t,point);
-        //     falinepoistions.push(point.x,point.y,point.z);
-        //     color.setHSL( t, 1.0, 0.5 );
-		// 	colors.push( color.r, color.g, color.b );
-        // }
-        // const geometry = new LineGeometry();
-		//       geometry.setPositions( falinepoistions );
-		// 		matLine = new LineMaterial( {
-
-		// 			color: 0x000000,
-		// 			linewidth: 5, // in world units with size attenuation, pixels otherwise
-		// 			vertexColors: true,
-					
-		// 			//resolution:  // to be set by renderer, eventually
-		// 			dashed: false,
-		// 			alphaToCoverage: true,
-
-		// 		} );
-
-		// 		line = new Line2( geometry, matLine );
-		// 		line.scale.set( 1, 1, 1 );
-        //         console.log(line)
-        // scene.add(line)
         sky = new Sky();
 		sky.scale.setScalar( 45000 );
 		scene.add( sky );
@@ -209,7 +151,7 @@
         if(Viewcontrols.lock_perspective)
         {
             controls.enabled = false;
-            camera.position.set(points[5].x+200,points[5].y+100,points[5].z)
+            camera.position.set(points[5].x+150,points[5].y+100,points[5].z)
             camera.lookAt(points[5]);
             if(Viewcontrols.look_down)
                 {
@@ -237,7 +179,6 @@
     setInterval(update_data,80);
     function render() {
         Controlcase();
-        brighten();
         
         if(renderEnabled)
         {
@@ -265,15 +206,12 @@
         requestAnimationFrame( animate );
         const delta = clock.getDelta();
         stats.update();
-        for(let i=0;i<11;i++)
+        for(let i=0;i<12;i++)
             mixer[i].update( delta );
-        //  composer.render();    
-       
     }
     function isconnect() {
         var start=new THREE.Vector3(0,0,0);
         var end=new THREE.Vector3(1,0,0);
-        // scene.remove(connectline);
       
         var allChildren = connectline.children;
         for (var j = allChildren.length - 1; j >= 0; j--) {
@@ -281,12 +219,6 @@
                 connectline.remove(allChildren[j]);
             }
         }
-        // var allPointsChildren = pointsAll.children;
-        // for (var j = allPointsChildren.length - 1; j >= 0; j--) {
-        //     if (allPointsChildren[j] instanceof THREE.Sprite) {
-        //         pointsAll.remove(allPointsChildren[j]);
-        //     }
-        // }
         for(var i=0;i<flyIndictor;i++)
         {
             for(var k=i;k<flyIndictor;k++)
@@ -304,31 +236,6 @@
     }
     function drawline(a,b)
     {
-        // var pointsX = (a.x-b.x)/2;
-        // var pointsZ = (a.z-b.z)/2;
-        // var length = Math.sqrt(((a.x-b.x)*(a.x-b.x))+((a.z-b.z)*(a.z-b.z)));
-        // console.log(length);
-        // vertices.push((a.x+b.x)/2,(a.y+b.y)/2,a.z);
-
-        // geometry1.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-        // const particles = new THREE.Points( geometry1, materials );
-        // pointsAll.add(particles);
-        // var spirte = new THREE.Sprite(materials);
-        // spirte.position.set((a.x+b.x)/2,(a.y+b.y)/2,a.z);
-        // spirte.scale.set(4,4,4);
-        // pointsAll.add(spirte);
-        // const linepoints =[];
-        // linepoints.push(a);
-        // linepoints.push(b);
-        // const material = new THREE.LineBasicMaterial( { color: 0x0000ff , linewidth: 2} );
-        // const geometry = new THREE.BufferGeometry().setFromPoints( linepoints );
-        // const line = new THREE.Line( geometry, material );
-        // connectline.add(line);
-        // const cylinder = new THREE.Mesh( new THREE.CylinderBufferGeometry(0.5,0.5,length), pillarmaterial );
-        // cylinder.position.set( pointsX,50,pointsZ);//两实体的中点，也就是柱子线的中点，自己理解
-        // console.log(cylinder.position);
-        
-        // cylinder.rotation.x -= Math.PI * 0.5;
         let geometry2 = new LineGeometry();
         var pointArr = [a.x,a.y,a.z,b.x,b.y,b.z];
         geometry2.setPositions(pointArr);
@@ -475,41 +382,6 @@
         }
 
     }
-    function brighten()
-    {
-                 composer = new EffectComposer( renderer );
-
-                var renderPass = new RenderPass( scene, camera );
-                composer.addPass( renderPass );
-
-                outlinePass = new OutlinePass( new THREE.Vector2( window.innerWidth, window.innerHeight ), scene, camera );
-                composer.addPass( outlinePass );
-
-                var onLoad = function ( texture ) {
-
-                    outlinePass.patternTexture = texture;
-                    texture.wrapS = THREE.RepeatWrapping;
-                    texture.wrapT = THREE.RepeatWrapping;
-
-                };
-
-                var ttloader = new THREE.TextureLoader();
-
-                ttloader.load( './images/tri_pattern.jpg', onLoad );
-
-                var effectFXAA = new ShaderPass( FXAAShader );
-                effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
-                effectFXAA.renderToScreen = true;
-                composer.addPass( effectFXAA );
-                outlinePass.selectedObjects =selectedObjects;
-
-    }
-    function addSelectedObject( object ) {
-        selectedObjects = [];
-        selectedObjects.push( object );
-
-    }
-    
         $("#lock_camera").click(function()
         {
             console.log(Viewcontrols.lock_perspective);
