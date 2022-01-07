@@ -20,6 +20,8 @@
     let mixer =[];
     var plane = [];
     const planepoints =[];
+    var sphere;
+    let arr,delArray,newArray;
     for(let i=0;i<10;i++)
     plane[i] = new THREE.Mesh(new THREE.BoxGeometry(0, 0, 0));
    
@@ -29,11 +31,23 @@
         this.look_down = false;
     }
     let linematerial = new LineMaterial({
-        linewidth: 5,
-        color: 0x156289,
+        linewidth: 3,
+        color: 0xffff00,
         // color:0xff0000,
         });
         linematerial.resolution.set(window.innerWidth+100,window.innerHeight+100);//这句如果不加宽度仍然无效
+    //新生成的拓扑线
+    let newlinematerial = new LineMaterial({
+        linewidth: 3,
+        color:0xff0000,
+        });
+     newlinematerial.resolution.set(window.innerWidth+100,window.innerHeight+100);//这句如果不加宽度仍然无效
+    //发生延时拓扑线
+    let misslinematerial = new LineMaterial({
+        linewidth: 3,
+        color:0x0000ff,
+        });
+    misslinematerial.resolution.set(window.innerWidth+100,window.innerHeight+100);//这句如果不加宽度仍然无效
     // let linetexture = new THREE.TextureLoader().load("images/line_image.png")
     // linetexture.wrapS = linetexture.wrapT = THREE.RepeatWrapping; //每个都重复
     // linetexture.repeat.set(1, 1)
@@ -148,7 +162,7 @@
                 plane[i] = plane[0].clone();
                 scene.add(plane[i]);
             }
-            for(let i=0;i<10;i++)
+            for(let i=0;i<flyIndictor;i++)
             {
                 mixer[i] = new THREE.AnimationMixer( plane[i] );
                 mixer[i].clipAction( gltf.animations[ 0 ] ).play();
@@ -180,7 +194,6 @@
         controls.target.set( 10, 90, - 16 );
         controls.update();
         window.addEventListener( 'resize', onWindowResize );
-        console.log(tArray);
 
         sky = new Sky();
 		sky.scale.setScalar( 45000 );
@@ -213,8 +226,10 @@
                     scene.add(bloomBox);
         if(experFlag==1)
         initbuilding();
+        var start=new THREE.Vector3(100,0,0);
+        var end = new THREE.Vector3(0,0,0);
+        // initline(start,end,0)
     }
-
     function onWindowResize() {
 
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -225,17 +240,16 @@
         render();
 
     }
-
     function Controlcase()
     {
         if(Viewcontrols.lock_perspective)
         {
             controls.enabled = false;
-            camera.position.set(points[5].x+150,points[5].y+100,points[5].z)
+            camera.position.set(points[5].x+100,points[5].y+100,points[5].z)
             camera.lookAt(points[5]);
             if(Viewcontrols.look_down)
                 {
-                    camera.position.set(points[5].x+30,points[5].y+40,points[5].z)
+                    camera.position.set(points[5].x+40,points[5].y+40,points[5].z)
                     camera.lookAt(points[5]);
                 }
         }
@@ -294,7 +308,7 @@
         var allbox = connectbox.children;
         var allChildren = connectline.children;
         for (var j = allChildren.length - 1; j >= 0; j--) {
-            if (allChildren[j] instanceof THREE.Mesh) {
+            if (allChildren[j] instanceof Line2) {
                 connectline.remove(allChildren[j]);
             }
         }
@@ -313,71 +327,43 @@
                 {   
                     start = points[i];
                     end = points[k];
-                    drawline(i,k,start,end);
+                    var flag=0;
+                    if(missFlag[i][k]!=0)
+                    flag=1;
+                    if(timeFlag[i][k] != 0)
+                        drawline(i,k,start,end,newlinematerial,flag);
+                    if(delayFlag[i][k]!=0)
+                        // initline(start,end,0);
+                        drawline(i,k,start,end,misslinematerial,flag);
+                    else if(delayFlag[i][k]==0&&timeFlag[i][k]==0)
+                        drawline(i,k,start,end,linematerial,flag);
                 }
             }   
         }
         scene.add(connectline);
         scene.add(connectbox);
     }
-    
-    function drawline(flyA,flyB,a,b)
+    function drawline(flyA,flyB,a,b,color,flag)
     {
+        //随机数组模拟延迟和丢包
+        var randombox=Math.floor((Math.random()*50)+1);
+
         var id=(flyA)*10+flyB;
         pointArr = [a.x,a.y,a.z,b.x,b.y,b.z];
         linegeo[id].setPositions(pointArr);
         linegroup[id].geometry=linegeo[id];
-        linegroup[id].material=linematerial;
+        linegroup[id].material=color;
         connectline.add(linegroup[id]);
-        if(choosecolor==0)
-        {
-             mymessage1[id] = mymessage.clone();
-            choosecolor = 1;
+        
+        if(flag==1)
+        {   
+            mymessage1[id] = mymessage.clone();
+            mymessage1[id].position.x = (a.x+b.x)/2;
+            mymessage1[id].position.y = a.y;
+            mymessage1[id].position.z = (a.z+b.z)/2;
+            connectbox.add(mymessage1[id]);
         }
-        else
-        {
-            mymessage1[id] = mymissmessage.clone();
-            choosecolor = 0;
-        }
-        mymessage1[id].position.x = (a.x+b.x)/2;
-        mymessage1[id].position.y = a.y;
-        mymessage1[id].position.z = (a.z+b.z)/2;
-        // function animatebox()
-        // {
-        //     i++;
-        //     mymessage1[id].position.x=a.x;
-        //     mymessage1[id].position.y=a.y;
-        //      mymessage1[id].position.z=a.z;
-        // targetPos = points[flyB];
-        // // var mtx = new THREE.Matrix4();
-        // // mtx.lookAt(mymessage1[id].position.clone() , targetPos , mymessage1[id].up) //设置朝向
-        // // mtx.multiply(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(0 , offsetAngle ,0 )))
-        // // var toRot = new THREE.Quaternion().setFromRotationMatrix(mtx)  //计算出需要进行旋转的四元数值
-        // // //根据以上值调整角度
-        // // mymessage1[id].quaternion.slerp(toRot, 0.2);
-        // // mymessage1[id].position.x=targetPos.x;
-        // // mymessage1[id].position.y=targetPos.y;
-        // // mymessage1[id].position.z=targetPos.z;
-        // if(mymessage1[id].position.x!=points[flyB].x&&mymessage1[id].position.z!=points[flyB].z)
-        // {mymessage1[id].position.x+=(points[flyB].x-points[flyA].x)*1/60;
-        // mymessage1[id].position.y+=(points[flyB].y-points[flyA].y)*1/60;}
-        // requestAnimationFrame (animatebox);
-        //     console.log(1);
-        // }
-        // if(i<=90)
-        //     animatebox();
-        connectbox.add(mymessage1[id]);
-//   linepoints.push(a,b);
 
-//   // CatmullRomCurve3创建一条平滑的三维样条曲线
-//   let curve = new THREE.CatmullRomCurve3(linepoints) // 曲线路径
-
-//   // 创建管道
-//   let tubeGeometry = new THREE.TubeGeometry(curve, 80,10)
-  
-//   let mesh = new THREE.Mesh(tubeGeometry, linematerial);
-
-//   connectline.add(mesh) ;
     }
     var targetPos;
     var offsetAngle = Math.PI/2 
@@ -406,10 +392,6 @@
     //      model.quaternion.slerp(toRot , 0.2)  //应用旋转。0.2代表插值step。可以做到平滑旋转过渡
     //     }
     // )   
-
-
-
-
 
     }
     function initbuilding() {
@@ -589,6 +571,109 @@
           torusKnot.position.y=50
           scene.add( torusKnot )
 
+    }
+    function initline(start,end,flag)
+    {
+        // start = new THREE.Vector3(100,0,0)
+        // end = new THREE.Vector3(0,0,0)
+        var amount = 20;
+ 
+        var radius = 2000;
+     
+        var positions = new Float32Array(amount * 3);
+        var colors = new Float32Array(amount * 3);
+        var sizes = new Float32Array(amount);
+     
+        var vertex = new THREE.Vector3();
+        var color = new THREE.Color(0xffffff);
+     
+        for (var i = 0; i < amount; i++) {
+            vertex.x = (Math.random() * 2 - 1) * radius;
+            vertex.y = (Math.random() * 2 - 1) * radius;
+            vertex.z = (Math.random() * 2 - 1) * radius;
+            vertex.toArray(positions, i * 3);
+            if (flag==0) {
+                color.setHSL(0.5 + 0.1 * (i / amount), 0.7, 0.5);
+     
+            }
+             else if(flag==1){
+                color.setHSL(0.0 + 0.1 * (i / amount), 0.9, 0.5);
+            }
+     
+            color.toArray(colors, i * 3);
+     
+            sizes[i] = 2; //线粗细
+     
+        }
+        var curve = new THREE.CatmullRomCurve3();
+
+        var points = [
+            start,
+            end,
+        ]
+        points.forEach(function (point) {
+            curve.points.push(point);
+        });
+        var geometry = new THREE.BufferGeometry();
+        geometry.vertices = curve.getPoints(amount - 1);
+        var pointArr = [];
+        var colorArr = [];
+        var objArr = geometry.vertices;
+        for (var i = 0; i < objArr.length; i++) {
+            pointArr.push(objArr[i].x);
+            pointArr.push(objArr[i].y);
+            pointArr.push(objArr[i].z);
+            colorArr.push(0);
+            colorArr.push(0);
+            colorArr.push(1);
+        }
+        pointArr = new Float32Array(pointArr);
+     
+        var geometry = new THREE.BufferGeometry();
+        geometry.addAttribute('position', new THREE.BufferAttribute(pointArr, 3));
+        geometry.addAttribute('customColor', new THREE.BufferAttribute(colors, 3));
+        geometry.addAttribute('size', new THREE.BufferAttribute(sizes, 1));
+        let v=`
+        attribute float size;  //顶点大小，由geometry的属性传入
+        attribute vec3 customColor; //顶点自定义颜色，由geometry的属性传入
+            varying vec3 vColor; //插值颜色
+            void main() {
+                vColor = customColor;    //插值颜色，由geometry的属性传入
+                gl_PointSize = 5.0*size ;
+                //gl_Position的计算总是固定为 投影矩阵*模型视图矩阵*位置向量
+                gl_Position =  projectionMatrix*modelViewMatrix * vec4( position, 1.0 );
+            }`
+     
+      let f=`
+            uniform vec3 color;   //顶点颜色 ，由shader构造材质时引入
+            uniform sampler2D pointTexture; //顶点纹理采样器
+            varying vec3 vColor;  //顶点插值颜色
+            void main() {
+               //原文 gl_FragColor = vec4( color * vColor, 1.0 ) * texture2D( pointTexture, gl_PointCoord );
+               //改为一下方式更好看，也易于初学者理解一些
+                gl_FragColor = vec4( color * vColor, 1.0 ) ;
+            }
+    `
+     
+        var material = new THREE.ShaderMaterial({
+     
+            uniforms: {
+                color: { value: new THREE.Color(0xf0ffff) },
+                pointTexture: { value: new THREE.TextureLoader().load("images/line_image.png") }
+            },
+            vertexShader: v,
+            fragmentShader: f,
+     
+            blending: THREE.AdditiveBlending,
+            depthTest: false,
+            depthWrite: false,
+            transparent: true
+     
+        });
+        const pmaterial = new THREE.PointsMaterial( { size: 15, vertexColors: true } );
+        sphere = new THREE.Points(geometry, pmaterial);
+        // connectline.add(sphere)
+        scene.add(sphere);
     }
         $("#lock_camera").click(function()
         {

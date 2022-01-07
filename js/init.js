@@ -16,8 +16,6 @@ for(var i=0;i<flyIndictor;i++)
     for(var k=0;k<flyIndictor;k++)
         tArray[i][k]=0;
 
-
-
 //初始化图表
 function initChart() {
     flyChart = echarts.init(document.getElementById('flyechart'));
@@ -112,6 +110,12 @@ function initChart() {
     for (var i = 0; i < flyIndictor; i++) {
         for (var j = 0; j < flyIndictor; j++) {
             timeFlag[i][j] = 0;
+        }
+    }
+    //missFlag初始化
+    for (var i = 0; i < flyIndictor; i++) {
+        for (var j = 0; j < flyIndictor; j++) {
+            missFlag[i][j] = 0;
         }
     }
     //节点初始化
@@ -1104,6 +1108,30 @@ function flyStep(name, x, y, target, isAttack, isCollision) {
             }
         }
     }
+   
+    //判断延迟标记，持续5次刷新
+    for (var i = 0; i < flyIndictor; i++) {
+        for (var j = 0; j < flyIndictor; j++) {
+            var randomline=Math.floor((Math.random()*100)+1);
+            if (randomline==5) {
+                delayFlag[i][j] = 5;
+            } else if (randomline!=5 && delayFlag[i][j] != 0) {
+                delayFlag[i][j] -= 1;
+            }
+        }
+    }
+
+    //判断丢包标记，持续3次刷新
+    for (var i = 0; i < flyIndictor; i++) {
+        for (var j = 0; j < flyIndictor; j++) {
+            var randombox=Math.floor((Math.random()*100)+1);
+            if (randombox==5) {
+                missFlag[i][j] = 5;
+            } else if (randombox!=5 && missFlag[i][j] != 0) {
+                missFlag[i][j] -= 1;
+            }
+        }
+    }
 
     //判断爆炸时间标记，持续3次刷新
     for (var i = 0; i < flyIndictor + spoofNum; i++) {
@@ -1126,7 +1154,6 @@ function flyStep(name, x, y, target, isAttack, isCollision) {
                 nodes[i].symbol = "image://" + "images/blueFly.png";
                 nodes[i].symbolSize = 16;
             } else {
-                console.log("进入");
 
                 nodes[i].name = name[i] + "'";
                 nodes[i].symbol = "image://" + "images/circleSpoof.png";
@@ -1149,7 +1176,6 @@ function flyStep(name, x, y, target, isAttack, isCollision) {
                     }
                 }
                 else {
-                    // console.log("进入");
                     var link = {
                         source: name[i],
                         target: j,
