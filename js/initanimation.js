@@ -79,13 +79,13 @@
         blending: THREE.AdditiveBlending,
         transparent: true
       })
-      var customMaterialmiss = new THREE.ShaderMaterial({
+      var customMaterialbox = new THREE.ShaderMaterial({
         uniforms: 
         { 
           "s":   { type: "f", value: -1.0},
           "b":   { type: "f", value: 3.0},
           "p":   { type: "f", value: 2.0 },
-          glowColor: { type: "c", value: new THREE.Color(0xff0000) }
+          glowColor: { type: "c", value: new THREE.Color(0xff00ff) }
         },
         vertexShader:   document.getElementById( 'vertexShader'   ).textContent,
         fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
@@ -94,8 +94,8 @@
         transparent: true
       })
       var messagebox = new THREE.BoxGeometry(1,1,1);
-      var mymessage =new THREE.Mesh(messagebox,customMaterial);
-      var mymissmessage = new THREE.Mesh(messagebox,customMaterialmiss);
+      var mymessage =new THREE.Mesh(messagebox,customMaterialbox);
+      //var mymissmessage = new THREE.Mesh(messagebox,customMaterialmiss);
        // 创建顶点数组
     let linepoints = [];
     var choosecolor =0;
@@ -134,7 +134,7 @@
         const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
         scene = new THREE.Scene();
-        scene.background = new THREE.Color( 0xbbbbbb );
+        scene.background = new THREE.Color( 0xffffff );
         scene.environment = pmremGenerator.fromScene( environment ).texture;
 
         const grid = new THREE.GridHelper( 500, 10, 0xffffff, 0xffffff );
@@ -148,16 +148,17 @@
         
         const loader = new GLTFLoader().setPath('models/gltf/' );
         loader.setDRACOLoader(dracoLoader);
-        loader.load( 'scenedraco.glb', function ( gltf ) {
+        loader.load( 'scene3.glb', function ( gltf ) {
             scene.add( gltf.scene );
         } );
-        const axes = new THREE.AxesHelper(1000);
+        //const axes = new THREE.AxesHelper(1000);
         // scene.add(axes);
         //构建一个坐标轴,蓝色是x轴，红色是z轴，绿色是y轴
         loader.load('redplanedraco.glb',function (gltf) {
             plane[0] = gltf.scene;
             plane[0].scale.set(30,30,30);
-            for(let i=1;i<flyIndictor;i++)
+            console.log(flyIndictor);
+            for(let i=1;i<9;i++)
             {
                 plane[i] = plane[0].clone();
                 scene.add(plane[i]);
